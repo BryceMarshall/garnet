@@ -12,7 +12,6 @@ or
 and
 then
 else
-elsif
 of
 end
 do
@@ -28,6 +27,7 @@ using
 val
 def
 unless
+elsif
 break
 when
 module
