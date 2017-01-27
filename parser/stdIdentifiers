@@ -10,26 +10,27 @@ div
 mod
 or
 and
-not
 then
 else
+elsif
 of
 end
-until
 do
 array
 file
 packed
-program
-const
 var
 type
-procedure
-begin
 if
 case
 while
-repeat
+using
+val
+def
+unless
+break
+when
+module
 
 % End of keywords
 
@@ -39,7 +40,7 @@ repeat
 
 % Predeclared type names
 integer
-char
+string
 boolean
 text
 
