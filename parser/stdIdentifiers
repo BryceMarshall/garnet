@@ -32,6 +32,7 @@ break
 when
 module
 
+25
 % End of keywords
 
 % Predeclared identifiers
@@ -44,6 +45,7 @@ string
 boolean
 text
 
+4
 % Predeclared constants
 true
 false
@@ -65,4 +67,5 @@ assign
 input
 output
 
+15
 % End of predeclared identifiers
