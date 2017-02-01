@@ -134,50 +134,21 @@ Output :
 
 rules
 
-Program :
-	'program'  .sProgram
-	% program name
-	pIdentifier
-	% program parameters
-	'('
-	{
-	    pIdentifier  .sIdentifier
-	    [
-		| ',':
-		| *:
-		    >
-	    ]
-	}
-	')'
-	.sParmEnd
-	';'  @Block  '.';
-
 Block :
 	% Strictly speaking, standard Pascal requires that declarations
 	% appear only in the order consts, types, vars, procedures.
 	% We allow arbitrary intermixing of these instead to preserve
 	% programmer sanity.
 	{[
-	    | 'const':
-		.sConst
-		@ConstantDefinitions
 	    | 'type':
 		.sType
 		@TypeDefinitions
 	    | 'var':
 		.sVar
 		@VariableDeclarations
-	    | 'procedure':
-		.sProcedure
-		% procedure name
-		pIdentifier  .sIdentifier
-		@ProcedureHeading
-		@Block  ';'
 	    | *:
 		>
 	]}
-	'begin'
-	@BeginStmt;
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
@@ -317,8 +288,6 @@ Statement :
 	[
 	    | pIdentifier:
 		@AssignmentOrCallStmt
-	    | 'begin':
-		@BeginStmt
 	    | 'if':
 		@IfStmt
 	    | 'while':
@@ -379,18 +348,6 @@ CallStmt :
 	    | *:	% no actual parameters
 	]
 	.sParmEnd;
-
-BeginStmt :
-	.sBegin
-	{
-	    @Statement
-	    [
-		| ';':
-		| 'end':
-		    .sEnd
-		    >
-	    ]
-	};
 
 IfStmt :
 	.sIfStmt
@@ -455,9 +412,6 @@ RepeatStmt :
 	    @Statement
 	    [
 		| ';':
-		| 'until':
-		    .sRepeatEnd
-		    >
 	    ]
 	}
 	@Expression
@@ -525,7 +479,7 @@ Factor :
 		.sInteger
 	    | '(':
 		@Expression  ')'
-	    | 'not':
+	    | '!':
 		@Factor
 		.sNot
 	    | pLiteral:
