@@ -817,6 +817,11 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	    charClassMap[ord(']')] := lRightBracket;
 	    charClassMap[ord('{')] := lLeftBrace;
 	    charClassMap[ord('}')] := lRightBrace;
+		charClassMap[ord('%')] := lPercent;
+		charClassMap[ord('#')] := lHash;
+		charClassMap[ord('!')] := lExclamation;
+		charClassMap[ord('?')] := lQuestion;
+		charClassMap[ord('$')] := lDollar;
 
 	    { Initialize the scan ssl table }
 	    reset(scanSsl {, NscanSsl} );
