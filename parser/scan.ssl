@@ -114,6 +114,11 @@ Output :
 	pLeftBracket
 	pRightBracket
 	pDotDot
+    pDoubleEquals
+    pNot
+    pQuestion
+    pDollar
+    pHash
 	lastSyntaxToken = pDotDot;
 
 Error :
@@ -184,7 +189,12 @@ Scan :
 		    | *:
 		]
 	    | '=':
-		.pEquals
+        [
+            | '=':
+            .pDoubleEquals
+            | *:
+		    .pEquals
+        ]
 	    | '+':
 		.pPlus
 	    | lQuote:
@@ -200,13 +210,18 @@ Scan :
 		]
 	    | '<':
 		[
-		    | '>':
-			.pNotEqual
 		    | '=':
 			.pLessEqual
 		    | *:
 			.pLess
 		]
+        | '!':
+        [
+            | '=' :
+            .pNotEqual
+            | * :
+            .pNot
+        ]
 	    | '>':
 		[
 		    | '=':
@@ -218,6 +233,12 @@ Scan :
 		@Comment
 	    | '*':
 		.pStar
+        | '?':
+        .pQuestion
+        | '$':
+        .pDollar
+        | '#':
+        .pHash
 	    | lNewPage:
 	    | lEndFile:
 		.pEndFile
