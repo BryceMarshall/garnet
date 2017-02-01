@@ -32,8 +32,6 @@ Input :
 	lRightParen	')'
 	lLeftBracket	'['
 	lRightBracket	']'
-	lLeftBrace	'{'
-	lRightBrace	'}'
     lPercent '%'
     lHash    '#'
     lExclamation '!'
@@ -113,8 +111,6 @@ Output :
 	pRightParen
 	pLeftBracket
 	pRightBracket
-	pLeftBrace
-    pRightBrace
 	pDotDot
     pDoubleEquals
     pNot
@@ -226,10 +222,6 @@ Scan :
 		    | *:
 			.pGreater
 		]
-	    | '{':
-		.pLeftBrace
-		| '}':
-        .pRightBrace
         | '%':
         @Comment
 	    | '*':
@@ -275,13 +267,8 @@ Literal :
 
 	{[
 	    | lQuote:
-		[
-		    | lQuote:
-			oBufferSave
-		    | *:
-			.pLiteral
-			>
-		]
+        .pLiteral
+        >
 	    | lNewLine:		% literal must not cross a line boundary
 		#eLiteralLine
 		.pNewLine
