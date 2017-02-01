@@ -32,11 +32,11 @@ Input :
 	lRightParen	')'
 	lLeftBracket	'['
 	lRightBracket	']'
-    lPercent '%'
-    lHash    '#'
-    lExclamation '!'
-    lQuestion '?'
-    lDollar '$'
+	lPercent '%'
+	lHash    '#'
+	lExclamation '!'
+	lQuestion '?'
+    	lDollar '$'
 	lBlank
 	lIllegal
 	lNewLine
@@ -117,7 +117,7 @@ Output :
     pQuestion
     pDollar
     pHash
-	lastSyntaxToken = pDotDot;
+	lastSyntaxToken = pHash;
 
 Error :
 	eIllegalChar = 5
