@@ -44,7 +44,7 @@ Input :
 	pBreak			'break'
 	pWhen			'when'
 	pModule			'module'
-	lastKeywordToken = pModule 
+	lastKeywordToken = pModule
 
 	pIdentifier 
 	firstCompoundInputToken = pIdentifier
@@ -148,7 +148,7 @@ Block :
 		@VariableDeclarations
 	    | *:
 		>
-	]}
+	]};
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
@@ -294,8 +294,6 @@ Statement :
 		@WhileStmt
 	    | 'case':
 		@CaseStmt
-	    | 'repeat':
-		@RepeatStmt
 	    | *:
 		.sNullStmt
 	];
@@ -479,8 +477,6 @@ Factor :
 		.sInteger
 	    | '(':
 		@Expression  ')'
-	    | '!':
-		@Factor
 		.sNot
 	    | pLiteral:
 		.sLiteral
