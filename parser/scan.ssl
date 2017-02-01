@@ -113,6 +113,8 @@ Output :
 	pRightParen
 	pLeftBracket
 	pRightBracket
+	pLeftBrace
+    pRightBrace
 	pDotDot
 	lastSyntaxToken = pDotDot;
 
@@ -152,12 +154,7 @@ Scan :
 	    | ';':
 		.pSemicolon
 	    | '(':
-		[
-		    | '*':
-			@AlternateComment
-		    | *:
-			.pLeftParen
-		]
+	    .pLeftParen
 	    | ')':
 		.pRightParen
 	    | '[':
@@ -215,7 +212,11 @@ Scan :
 			.pGreater
 		]
 	    | '{':
-		@Comment
+		.pLeftBrace
+		| '}':
+        .pRightBrace
+        | '%':
+        @Comment
 	    | '*':
 		.pStar
 	    | lNewPage:
@@ -277,33 +278,13 @@ Comment :
 	% Discard the contents of a comment
 
 	{[
-	    | '}':
-		>
 	    | lNewLine:
 		.pNewLine
-	    | lEndFile:		% comment must be closed before EOF
-		#eCommentEOF
+		>
+	    | lEndFile:
 		.pEndFile
 		>
 	    | *:	% comment may contain any other character
-		?
-	]};
-
-AlternateComment :
-	{[
-	    | '*':
-		[
-		    | ')':
-			>
-		    | *:
-		]
-	    | lNewLine:
-		.pNewLine
-	    | lEndFile:
-		#eCommentEOF
-		.pEndFile
-		>
-	    | *:
 		?
 	]};
 

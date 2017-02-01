@@ -86,7 +86,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	{ Nonexistent input token used only in syntax error recovery }
 	pSyntaxError = -1;
 
-{ ===== Scanner -> Parser token stream defintiions (scanner output tokens),
+{ ===== Scanner -> Parser token stream definitions (scanner output tokens),
 	copied here from scan.def or parser.def, which must agree!}
 
 	{ Output Tokens }
@@ -250,7 +250,6 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	eIllegalChar = 5;
 	eLiteralLine = 6;
 	eLiteralEOF = 7;
-	eCommentEOF = 8;
 	eNoSeparator = 9;
 	lastScanError = 9;
 
@@ -555,8 +554,6 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 			write('syntax error at: ');
 			ReportSyntaxError
 		    end;
-		eCommentEOF:
-		    write('unclosed comment');
 		eLiteralEOF:
 		    write('unclosed literal string');
 		eLiteralLine:
