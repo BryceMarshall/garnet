@@ -320,7 +320,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	{ misc. }
 	tab = '	';
 	blank = ' ';
-	quote = '''';
+	quote = '"';
 	null = 0;
 
 	{ Phase identification values - for use by common routines }
