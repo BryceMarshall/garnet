@@ -1,0 +1,7 @@
+%Compare behaviour of new assignment/equality operators vs old
+id1 = 1 
+id2 := 2
+eq1 != 1
+eq2 <> 2 
+eq3 ! 3
+eq4 not 4

@@ -1,0 +1,18 @@
+%Test that new keywords are recognized and old ones are not
+using
+val
+def
+unless
+elsif
+break
+when
+module
+string
+not
+until
+program
+const
+procedure
+begin
+repeat
+char

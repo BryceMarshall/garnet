@@ -96,7 +96,7 @@ Output :
 	pPlus
 	pMinus
 	pStar
-	pColonEquals
+	pAssign
 	pDot
 	pComma
 	pSemicolon
@@ -165,12 +165,7 @@ Scan :
 	    | ',':
 		.pComma
 	    | ':':
-		[
-		    | '=':
-			.pColonEquals
-		    | *:
-			.pColon
-		]
+		.pColon
 	    | lDigit:
 		oBufferSave
 		@Integer
@@ -186,7 +181,7 @@ Scan :
             | '=':
             .pDoubleEquals
             | *:
-		    .pEquals
+		    .pAssign
         ]
 	    | '+':
 		.pPlus

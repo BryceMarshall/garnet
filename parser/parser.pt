@@ -132,7 +132,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	pPlus = 30;
 	pMinus = 31;
 	pStar = 32;
-	pColonEquals = 33;
+	pAssign = 33;
 	pDot = 34;
 	pComma = 35;
 	pSemicolon = 36;

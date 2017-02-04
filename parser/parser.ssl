@@ -57,13 +57,13 @@ Input :
 	pPlus			'+'
 	pMinus			'-'
 	pStar			'*'
-	pColonEquals		':='
+	pAssign			'='
 	pDot			'.'
 	pComma			','
 	pSemicolon		';'
 	pColon			':'
-	pEquals			'='
-	pNotEqual		'<>'
+	pEquals			'=='
+	pNotEqual		'!='
 	pLess			'<'
 	pLessEqual		'<='
 	pGreaterEqual		'>='
@@ -300,7 +300,7 @@ Statement :
 
 AssignmentOrCallStmt :
 	[
-	    | ':=':
+	    | '=':
 		.sAssignmentStmt
 		.sIdentifier	% identifier accepted in the Statement rule
 		@Expression
@@ -311,7 +311,7 @@ AssignmentOrCallStmt :
 		.sSubscript
 		@Expression
 		.sExpnEnd
-		']'  ':='
+		']'  '='
 		@Expression
 		.sExpnEnd
 	    | *:
@@ -420,7 +420,7 @@ Expression :
 	[
 	    | '=':
 		@SimpleExpression  .sEq
-	    | '<>':
+	    | '!=':
 		@SimpleExpression  .sNE
 	    | '<':
 		@SimpleExpression  .sLT

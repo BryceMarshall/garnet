@@ -1,0 +1,8 @@
+%Test that all new symbols are recognized as their proper tokens
+#
+!
+?
+$
+:=
+"String"
+'Char'

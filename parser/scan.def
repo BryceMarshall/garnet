@@ -71,7 +71,7 @@
 	pPlus = 30;
 	pMinus = 31;
 	pStar = 32;
-	pColonEquals = 33;
+	pAssign = 33;
 	pDot = 34;
 	pComma = 35;
 	pSemicolon = 36;
@@ -109,13 +109,13 @@
 
 	{ S/SL Rule Table Addresses } {
 	Scan = 0;
-	Identifier = 233;
-	Integer = 250;
-	Literal = 265;
-	Comment = 301;
+	Identifier = 224;
+	Integer = 241;
+	Literal = 256;
+	Comment = 292;
 	}
 
 	{ S/SL Table Parameters }
-	sslTblSize = 324;
+	sslTblSize = 315;
 	minSslTableValue = -32767;
 	maxSslTableValue = 32767;
