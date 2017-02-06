@@ -1,7 +1,12 @@
 %Compare behaviour of new assignment/equality operators vs old
-id1 = 1 
-id2 := 2
+
+%These should be recognized as equality and assignment operators by the scanner:
+id1 = 1
 eq1 != 1
-eq2 <> 2 
+eq2 == 2 
 eq3 ! 3
+
+%These should not be recognized as valid operators:
+id2 := 2
 eq4 not 4
+eq2 <> 2 

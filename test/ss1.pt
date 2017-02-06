@@ -1,4 +1,7 @@
 %Test that new keywords are recognized and old ones are not
+
+%These keywords should be recognized:
+
 using
 val
 def
@@ -8,6 +11,8 @@ break
 when
 module
 string
+
+%These keywords should NOT be recognized, and should emit an eIllegalCharacter token when encountered:
 not
 until
 program
