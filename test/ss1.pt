@@ -12,7 +12,7 @@ when
 module
 string
 
-%These keywords should NOT be recognized, and should emit an eIllegalCharacter token when encountered:
+%These keywords should NOT be recognized:
 not
 until
 program
