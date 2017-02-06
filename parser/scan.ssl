@@ -281,10 +281,10 @@ Comment :
 	% Discard the contents of a comment
 
 	{[
-	    | lNewLine:
+	    | lNewLine:     % comments are closed by a newline
 		.pNewLine
 		>
-	    | lEndFile:
+	    | lEndFile:     % comments need not be closed before EOF
 		.pEndFile
 		>
 	    | *:	% comment may contain any other character
