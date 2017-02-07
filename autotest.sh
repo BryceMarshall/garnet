@@ -1,18 +1,21 @@
-DIRECTORY="/cas/student/cisc458o/Zdrive/ptsrc/test/phase1"
-SCAN="/cas/student/cisc458o/Zdrive/ptsrc/parser/scan.def"
+PTSRC = "/cas/student/cisc458o/Zdrive/ptsrc"
+SCAN_DEF = $PTSRC + "/parser/scandef"
+TEST_DIR = $PTSRC + "/test/phase1"
+OUTFILE = phase1tests.txt
+
 counter=1
-> TestResults
-for f in $(ls $DIRECTORY)
+> $OUTFILE
+for f in $(ls $TEST_DIR)
 do
-	echo $DIRECTORY/$f
-	echo "Test $counter File: $f" >> TestResults 
-	echo >> TestResults	
-	echo "External Trace:" >> TestResults
-	ssltrace "ptc –t1 –o1 -L /cas/student/cisc458o/Zdrive/ptsrc/lib/pt $DIRECTORY/$f" $SCAN -e >> TestResults
-	echo "Internal Trace:" >> TestResults
-	echo >> TestResults	
-	ssltrace "ptc –t1 –o1 -L /cas/student/cisc458o/Zdrive/ptsrc/lib/pt $DIRECTORY/$f" $SCAN -i >> TestResults
-	echo >> TestResults	
-	echo "*****************" >> TestResults 
+	echo $TEST_DIR/$f
+	echo "Test $counter File: $f" >> $OUTFILE
+	echo >> $OUTFILE
+	echo "External Trace:" >> $OUTFILE
+	ssltrace "ptc –t1 –o1 -L $PTSRC/lib/pt $TEST_DIR/$f" $SCAN_DEF -e >> $OUTFILE
+	echo "Internal Trace:" >> $OUTFILE
+	echo >> $OUTFILE
+	ssltrace "ptc –t1 –o1 -L $PTSRC/lib/pt $TEST_DIR/$f" $SCAN_DEF -i >> $OUTFILE
+	echo >> $OUTFILE
+	echo "*****************" >> $OUTFILE
 	counter=$[counter+1]
 done
