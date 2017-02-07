@@ -1,8 +1,8 @@
 #!/bin/bash
 
 PTSRC="/cas/student/cisc458o/Zdrive/ptsrc"
-SCAN_DEF=${PTSRC}+"/parser/scandef"
-TEST_DIR=${PTSRC}+"/test/phase1"
+SCAN_DEF="${PTSRC}/parser/scandef"
+TEST_DIR="${PTSRC}/test/phase1"
 OUTFILE=phase1tests.txt
 
 counter=1
