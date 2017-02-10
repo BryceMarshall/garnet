@@ -1680,4 +1680,4 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	{ No sense running semantic phase if serious syntax errors found }
 	if errorCount > 0 then
 	    rewrite(parseStream {, NparseStream} );
-    end.  { ScannerParser }`
+    end.  { ScannerParser }
