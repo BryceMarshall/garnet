@@ -96,7 +96,6 @@ Output :
 	pPlus
 	pMinus
 	pStar
-	pAssign
 	pDot
 	pComma
 	pSemicolon
