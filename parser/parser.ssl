@@ -473,14 +473,14 @@ CaseAlternative :
 	]};
 
 CaseDefault :
-    @BeginStatement;
+    @BeginStmt;
 
 WhileStmt :
 	.sWhileStmt
 	@Expression
 	.sExpnEnd
 	'do'
-	@BeginStatement;
+	@BeginStmt;
 
 DoStmt :
 	.sDo
