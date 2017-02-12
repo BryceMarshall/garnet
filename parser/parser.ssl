@@ -549,13 +549,21 @@ Term :
 	@Factor
 	{[
 	    | '*':
-		@Factor  .sMultiply
+		@Factor  
+        .sMultiply
 	    | 'div':
-		@Factor  .sDivide
+		@Factor  
+        .sDivide
 	    | 'mod':
-		@Factor  .sModulus
+		@Factor  
+        .sModulus
 	    | 'and':
-		.sInfixAnd  @Factor  .sAnd
+		.sInfixAnd  
+        @Factor  
+        .sAnd
+        | '?':
+        @Factor
+        .sSubstring
 	    | *:
 		>
 	]};
@@ -572,6 +580,9 @@ Factor :
 	    | '!':
 		@Factor
 		.sNot
+        | '#':
+        @Factor
+        .sIndex
 	    | pLiteral:
 		.sLiteral
 	    | 'file':
