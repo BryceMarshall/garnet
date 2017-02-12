@@ -392,7 +392,7 @@ IfStmt :
 	.sExpnEnd
 	'then' .sThen
 	.sBegin
-	[
+	{[
 	    | 'end':
 	    .sEnd
 	    >
@@ -406,11 +406,10 @@ IfStmt :
 	    .sElse
 	    .sBegin
 	    @IfStmt
-	    .sEnd
 	    >
 	    | *:
 	    @Statement
-	];
+	]};
 
 UnlessStmt :
     .sIfStmt
