@@ -133,7 +133,7 @@ Output :
 	sNewLine
     sPublic
     sModule
-    sDoStmt
+    sDo
     sBreakIf
     sSubstring
     sLength
