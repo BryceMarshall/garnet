@@ -326,23 +326,23 @@ Statement :
 	[
 	    | pIdentifier:
 		@AssignmentOrCallStmt
-	    | 'begin':
-		@BeginStmt
 	    | 'if':
 		@IfStmt
+		| 'unless':
+		@UnlessStmt
 	    | 'while':
 		@WhileStmt
 	    | 'case':
 		@CaseStmt
-	    | 'repeat':
-		@RepeatStmt
+	    | 'do':
+		@DoStmt
 	    | *:
 		.sNullStmt
 	];
 
 AssignmentOrCallStmt :
 	[
-	    | ':=':
+	    | '=':
 		.sAssignmentStmt
 		.sIdentifier	% identifier accepted in the Statement rule
 		@Expression
@@ -353,7 +353,7 @@ AssignmentOrCallStmt :
 		.sSubscript
 		@Expression
 		.sExpnEnd
-		']'  ':='
+		']'  '='
 		@Expression
 		.sExpnEnd
 	    | *:
@@ -405,35 +405,55 @@ IfStmt :
 	.sIfStmt
 	@Expression
 	.sExpnEnd
-	'then'  .sThen
-	@Statement
+	'then' .sThen
+	.sBegin
 	[
+	    | 'end':
+	    .sEnd
+	    >
 	    | 'else':
-		.sElse
-		@Statement
+        .sEnd
+        .sElse
+        @BeginStmt
+        >
+	    | 'elsif':
+	    .sEnd
+	    .sElse
+	    .sBegin
+	    @IfStmt
+	    .sEnd
+	    >
 	    | *:
+	    @Statement
 	];
+
+UnlessStmt :
+    .sIfStmt
+    @Expression
+    .sNot
+    .sExpnEnd
+    'then' .sThen
+    @BeginStmt;
 
 CaseStmt :
 	.sCaseStmt
 	@Expression
 	.sExpnEnd
-	'of'
-	@CaseAlternative
-	{[
+	[
 	    | ';':
 		% since case alternatives cannot be null, allow
 		% for the common situation of an extra semicolon
 		% at the end of the list of case alternatives.
 		[
+		    | 'when':
+            @CaseAlternative
+		    | 'else':
+		    @CaseDefault
+		    >
 		    | 'end':
 			>
-		    | *:
-			@CaseAlternative
 		]
-	    | 'end':
-		>
-	]}
+	]
 	.sCaseEnd;
 
 CaseAlternative :
@@ -448,36 +468,60 @@ CaseAlternative :
 		    >
 	    ]
 	}
+	'then'
 	.sLabelEnd
-	':'  @Statement;
+	.sBegin
+	{[
+	    | 'when':
+	    .sEnd
+	    @CaseAlternative
+	    >
+	    | 'else':
+	    .sEnd
+	    @CaseDefault
+	    >
+	    | 'end':
+	    .sEnd
+	    >
+	    |*:
+	    @Statement
+	]};
+
+CaseDefault :
+    @BeginStatement;
 
 WhileStmt :
 	.sWhileStmt
 	@Expression
 	.sExpnEnd
 	'do'
-	@Statement;
+	@BeginStatement;
 
-RepeatStmt :
-	.sRepeatStmt
-	{
-	    @Statement
-	    [
-		| ';':
-		| 'until':
-		    .sRepeatEnd
+DoStmt :
+	.sDo
+	.sBegin
+	{[
+		| 'break':
+		 'if'
+		 .sEnd
+		 .sBreakIf
+		 @Expression
+		 .sExpnEnd
+		 .sBegin
 		    >
-	    ]
-	}
-	@Expression
+	    | ';':
+	    |*:
+	    @Statement
+	]}
+	.sEnd
 	.sExpnEnd;
 
 Expression :
 	@SimpleExpression
 	[
-	    | '=':
+	    | '==':
 		@SimpleExpression  .sEq
-	    | '<>':
+	    | '!=':
 		@SimpleExpression  .sNE
 	    | '<':
 		@SimpleExpression  .sLT
