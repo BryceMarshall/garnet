@@ -23,7 +23,7 @@ Input :
 	pMod            'mod'
 	pOr             'or'
 	pAnd            'and'
-	pThen           'not'
+	pThen           'then'
 	pElse           'else'
 	pOf             'of'
 	pEnd            'end'
