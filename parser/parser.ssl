@@ -430,12 +430,10 @@ CaseStmt :
 		% at the end of the list of case alternatives.
 		[
 		    | 'when':
-            @CaseAlternative
+            	    @CaseAlternative
 		    | 'else':
 		    @CaseDefault
-		    >
 		    | 'end':
-			>
 		]
 	]
 	.sCaseEnd;
@@ -562,7 +560,7 @@ Factor :
 		.sInteger
 	    | '(':
 		@Expression  ')'
-	    | 'not':
+	    | '!':
 		@Factor
 		.sNot
 	    | pLiteral:
