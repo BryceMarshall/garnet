@@ -1,0 +1,4 @@
+using progName
+"Hello, world!" $ 1..2
+"Hello, world!" $ 1*2..3 
+%Checking precedence level, $ is higher precedence than *

@@ -1,0 +1,3 @@
+using progName
+"Hello there" ? "the" %7
+"Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
