@@ -153,7 +153,8 @@ Program :
 		>
 	]}
 	.sParmEnd
-	@Block;
+	@Block
+	.sEnd;
 		
 Block :
 	% Strictly speaking, standard Pascal requires that declarations
