@@ -546,6 +546,15 @@ SimpleExpression :
 	]};
 
 Term :
+    [
+        |'$':
+            @Term
+            .sSubstring
+        |*:
+            @SubTerm
+    ];
+
+SubTerm :
 	@Factor
 	{[
 	    | '*':
@@ -563,7 +572,7 @@ Term :
         .sAnd
         | '?':
         @Factor
-        .sSubstring
+        .sIndex
 	    | *:
 		>
 	]};
@@ -582,7 +591,7 @@ Factor :
 		.sNot
         | '#':
         @Factor
-        .sIndex
+        .sLength
 	    | pLiteral:
 		.sLiteral
 	    | 'file':
