@@ -144,30 +144,24 @@ Output :
 rules
 
 Program :
-	'program'  .sProgram
-	% program name
-	pIdentifier
-	% program parameters
-	'('
-	{
-	    pIdentifier  .sIdentifier
-	    [
-		| ',':
-		| *:
-		    >
-	    ]
-	}
-	')'
+	'using' .sProgram
+	pIdentifier .sIdentifier
+	{[
+	    | ',' :
+		pIdentifier .sIdentifier
+	    | * :
+		>
+	]}
 	.sParmEnd
-	';'  @Block  '.';
-
+	@Block;
+		
 Block :
 	% Strictly speaking, standard Pascal requires that declarations
 	% appear only in the order consts, types, vars, procedures.
 	% We allow arbitrary intermixing of these instead to preserve
 	% programmer sanity.
 	{[
-	    | 'const':
+	    | 'val':
 		.sConst
 		@ConstantDefinitions
 	    | 'type':
@@ -176,29 +170,30 @@ Block :
 	    | 'var':
 		.sVar
 		@VariableDeclarations
-	    | 'procedure':
+	    | 'def':
 		.sProcedure
 		% procedure name
-		pIdentifier  .sIdentifier
+		[
+		    | pStar :
+			pIdentifier .sIdentifier .sPublic
+		    | pIdentifier :
+			.sIdentifier
+		]
 		@ProcedureHeading
 		@Block  ';'
+	    | 'module':
+		.sModule
+		pIdentifier .sIdentifier
+		@Block
 	    | *:
 		>
 	]}
-	'begin'
 	@BeginStmt;
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
 	pIdentifier  .sIdentifier
-	@ConstantValue ';'
-	{[
-	    | pIdentifier:
-		.sIdentifier
-		@ConstantValue ';'
-	    | *:
-		>
-	]};
+	@ConstantValue;
 
 ConstantValue :
 	'='
@@ -227,14 +222,7 @@ UnsignedIntegerConstant :
 TypeDefinitions :
 	% Accept one or more named type definitions.
 	pIdentifier  .sIdentifier
-	'='  @TypeBody  ';'
-	{[
-	    | pIdentifier:
-		.sIdentifier
-		'='  @TypeBody  ';'
-	    | *:
-		>
-	]};
+	':'  @TypeBody;
 
 TypeBody :
 	[
@@ -285,14 +273,11 @@ OptionallySignedIntegerConstant :
 VariableDeclarations :
 	% Accept one or more variable declarations.
 	pIdentifier  .sIdentifier
-	':'  @TypeBody  ';'
 	{[
-	    | pIdentifier:
-		.sIdentifier
-		':'  @TypeBody  ';'
-	    | *:
-		>
-	]};
+	    | pComma: pIdentifier .sVar .sIdentifier
+	    | ':' : >
+	]}
+	@TypeBody;
 
 ProcedureHeading :
 	% Accept zero or more procedure formal parameter declarations.
@@ -311,7 +296,7 @@ ProcedureHeading :
 		    % type identifier
 		    pIdentifier  .sIdentifier
 		    [
-			| ';':
+			| ',':
 			| *:
 			    >
 		    ]

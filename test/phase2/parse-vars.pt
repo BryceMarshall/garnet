@@ -1,0 +1,4 @@
+using progName
+var a,b,c : integer
+var a : string
+var b : boolean
