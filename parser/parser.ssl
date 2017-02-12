@@ -376,15 +376,23 @@ CallStmt :
 
 BeginStmt :
 	.sBegin
-	{
-	    @Statement
-	    [
-		| ';':
-		| 'end':
-		    .sEnd
-		    >
-	    ]
-	};
+	{[
+	    | 'end':
+	        .sEnd
+	        >
+        |*:
+        @Statement
+	]};
+
+%	{
+%	    @Statement
+%	    [
+%		| ';':
+%		| 'end':
+%		    .sEnd
+%		    >
+%	    ]
+%	};
 
 IfStmt :
 	.sIfStmt
