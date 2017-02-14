@@ -197,7 +197,6 @@ ProgramStatements :
 	{
 	    [
 	    | pEndFile:
-		.sEnd
 	        >
 	    ]
 	    @Statement
