@@ -154,7 +154,7 @@ Program :
 	]}
 	.sParmEnd
 	@Block
-	@Statement;
+	@ProgramStatements;
 		
 Block :
     % In Garnet, declarations must come before statements.
@@ -194,15 +194,24 @@ Block :
 
 ProgramStatements :
 	.sBegin
-	{
-	    [
-	    | pEndFile:
-	        >
+    {[
+	    | pIdentifier:
+		@AssignmentOrCallStmt
+	    | 'if':
+		@IfStmt
+		| 'unless':
+		@UnlessStmt
+	    | 'while':
+		@WhileStmt
+	    | 'case':
+		@CaseStmt
+	    | 'do':
+		@DoStmt
+        |';':
         |*:
-            @Statement
-	    ]
-	}
-	.sEnd;
+        >
+    ]}
+    .sEnd;
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
@@ -539,14 +548,14 @@ Expression :
 	];
 
 SimpleExpression :
-	[
-	    | '+':
-		@Term
-	    | '-':
-		@Term  .sNegate
-	    | *:
-		@Term
-	]
+%	[
+%	    | '+':
+%		@Term
+%	    | '-':
+%		@Term  .sNegate
+%	    | *:
+%		@Term
+%	]
 	{[
 	    | '+':
 		@Term  .sAdd
