@@ -1,4 +1,4 @@
 using progName
 var a : integer
-a == 2
+;
 a = 2
