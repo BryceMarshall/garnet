@@ -568,37 +568,37 @@ SimpleExpression :
 	]};
 
 Term :
-    {[
-        | '$':
-            @Term
-            .sSubstring
-        | *:
-            >
-    ]}
-    @SubTerm;
-
-SubTerm :
-	@Factor
+	@SubTerm
 	{[
 	    | '*':
-		@Factor  
+		@SubTerm  
         .sMultiply
 	    | 'div':
-		@Factor  
+		@SubTerm 
         .sDivide
 	    | 'mod':
-		@Factor  
+		@SubTerm 
         .sModulus
 	    | 'and':
 		.sInfixAnd  
-        @Factor  
+        @SubTerm 
         .sAnd
         | '?':
-        @Factor
+        @SubTerm
         .sIndex
 	    | *:
 		>
 	]};
+
+SubTerm :
+    @Factor
+    {[
+        | '$':
+            @SubTerm
+            .sSubstring
+        | *:
+            >
+    ]};
 
 Factor :
 	[
