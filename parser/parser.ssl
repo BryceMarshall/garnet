@@ -194,13 +194,14 @@ Block :
 
 ProgramStatements :
 	.sBegin
-	{[
+	{
+	    @Statement
+	    [
 	    | pEndFile:
 	        .sEnd
 	        >
-        |*:
-        @Statement
-	]};
+	    ]
+	};
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
