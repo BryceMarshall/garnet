@@ -335,6 +335,7 @@ Statement :
 		@CaseStmt
 	    | 'do':
 		@DoStmt
+        |;:
 	    | *:
 		.sEnd
 	];
