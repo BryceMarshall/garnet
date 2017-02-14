@@ -195,13 +195,13 @@ Block :
 ProgramStatements :
 	.sBegin
 	{
-	    @Statement
 	    [
-	    | pEndFile:
-	        .sEnd
+        | pEndFile:
 	        >
 	    ]
-	};
+	    @Statement
+	}
+	.sEnd;
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
