@@ -1,0 +1,10 @@
+using progName
+var a : integer
+a = 2
+if a == 2 then
+    a = 3
+elsif a == 3 then
+    a = 4
+else
+    a = 5
+end
