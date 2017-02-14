@@ -1,3 +1,7 @@
 using progName
+#"Hello" %5
+#"Hello" * 5
+"Hello, world!" $ 1..2
+"Hello, world!" $ 1*2..3 
 "Hello there" ? "the" %7
 "Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
