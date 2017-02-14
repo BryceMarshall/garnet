@@ -154,7 +154,7 @@ Program :
 	]}
 	.sParmEnd
 	@Block
-	@ProgramStatements;
+	@Statement;
 		
 Block :
     % In Garnet, declarations must come before statements.
@@ -336,8 +336,7 @@ Statement :
 	    | 'do':
 		@DoStmt
 	    | *:
-		?
-		.sNullStmt
+		.sEnd
 	];
 
 AssignmentOrCallStmt :
