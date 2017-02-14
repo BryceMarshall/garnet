@@ -568,13 +568,14 @@ SimpleExpression :
 	]};
 
 Term :
-    [
-        |'$':
+    {[
+        | '$':
             @Term
             .sSubstring
-        |*:
-            @SubTerm
-    ];
+        | *:
+            >
+    ]}
+    @SubTerm;
 
 SubTerm :
 	@Factor
