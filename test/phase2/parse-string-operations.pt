@@ -8,3 +8,4 @@ b = "Hello, world!" $ 1..2
 b = "Hello, world!" $ 1*2..3 
 c = "Hello there" ? "the" %7
 c = "Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
+end
