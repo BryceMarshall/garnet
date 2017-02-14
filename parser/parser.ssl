@@ -198,7 +198,7 @@ ProgramStatements :
 	    @Statement
 	    [
 	    | pEndFile:
-	        .sEnd
+		.sEnd
 	        >
 	    ]
 	};
@@ -335,6 +335,7 @@ Statement :
 	    | 'do':
 		@DoStmt
 	    | *:
+		?
 		.sNullStmt
 	];
 
