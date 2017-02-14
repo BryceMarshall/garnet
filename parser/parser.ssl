@@ -594,7 +594,9 @@ SubTerm :
     @Factor
     {[
         | '$':
-            @SubTerm
+    		@OptionallySignedIntegerConstant
+    		'..'
+    		@OptionallySignedIntegerConstant
             .sSubstring
         | *:
             >
