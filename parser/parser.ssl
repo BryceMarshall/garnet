@@ -154,13 +154,13 @@ Program :
 	]}
 	.sParmEnd
 	@Block
-	.sEnd;
+	@ProgramStatements;
 		
 Block :
-	% Strictly speaking, standard Pascal requires that declarations
-	% appear only in the order consts, types, vars, procedures.
-	% We allow arbitrary intermixing of these instead to preserve
-	% programmer sanity.
+    % In Garnet, declarations must come before statements.
+    % PT Pascal allows intermixing of various declarations
+    % (constants, types, vars, and procedures), so we
+    % preserve this along with our new declarations.
 	{[
 	    | 'val':
 		.sConst
@@ -181,15 +181,26 @@ Block :
 			.sIdentifier
 		]
 		@ProcedureHeading
-		@Block  ';'
+		@Block
+		@BlockStatements
 	    | 'module':
 		.sModule
 		pIdentifier .sIdentifier
 		@Block
+		@BlockStatements
 	    | *:
 		>
-	]}
-	@BeginStmt;
+	]};
+
+ProgramStatements :
+	.sBegin
+	{[
+	    | pEndFile:
+	        .sEnd
+	        >
+        |*:
+        @Statement
+	]};
 
 ConstantDefinitions :
 	% Accept one or more named constant definitions
@@ -375,7 +386,7 @@ CallStmt :
 	]
 	.sParmEnd;
 
-BeginStmt :
+BlockStatements :
 	.sBegin
 	{[
 	    | 'end':
@@ -408,7 +419,7 @@ IfStmt :
 	    | 'else':
         .sEnd
         .sElse
-        @BeginStmt
+        @BlockStatements
         >
 	    | 'elsif':
 	    .sEnd
@@ -426,7 +437,7 @@ UnlessStmt :
     .sNot
     .sExpnEnd
     'then' .sThen
-    @BeginStmt;
+    @BlockStatements;
 
 CaseStmt :
 	.sCaseStmt
@@ -479,14 +490,14 @@ CaseAlternative :
 	]};
 
 CaseDefault :
-    @BeginStmt;
+    @BlockStatements;
 
 WhileStmt :
 	.sWhileStmt
 	@Expression
 	.sExpnEnd
 	'do'
-	@BeginStmt;
+	@BlockStatements;
 
 DoStmt :
 	.sDo
