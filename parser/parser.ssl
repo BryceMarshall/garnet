@@ -336,9 +336,8 @@ Statement :
 	    | 'do':
 		@DoStmt
         |';':
-	    | *:
-		.sEnd
 	];
+    .sEnd
 
 AssignmentOrCallStmt :
 	[
