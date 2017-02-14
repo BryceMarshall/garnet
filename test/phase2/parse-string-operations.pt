@@ -1,7 +1,13 @@
 using progName
-#"Hello" %5
-#"Hello" * 5
-"Hello, world!" $ 1..2
-"Hello, world!" $ 1*2..3 
-"Hello there" ? "the" %7
-"Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
+var a : integer
+var b : integer
+var c : string
+var d : integer
+a = 2
+if a==2 then
+    b = #"Hello" %5
+    b = #"Hello" * 5
+    c = "Hello, world!" $ 1..2
+    c = "Hello, world!" $ 1*2..3 
+    d = "Hello there" ? "the" %7
+    d = "Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
