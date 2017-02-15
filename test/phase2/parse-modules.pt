@@ -1,0 +1,7 @@
+using progName
+module M
+    var a: integer
+    a = 2
+var b ; integer
+b = 2
+
