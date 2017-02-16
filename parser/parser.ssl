@@ -307,28 +307,62 @@ ProcedureHeading :
 	[
 	    | '(':
 		{
-		    % formal parameter identifier
-		    [
-			| 'var':
-			    pIdentifier  .sIdentifier
-			    .sVar
-			| *:
-			    pIdentifier  .sIdentifier
-		    ]
-		    ':'
-		    % type identifier
-		    pIdentifier  .sIdentifier
-		    [
-			| ',':
-			| *:
-			    >
-		    ]
-		}
-		')'
-	    | *:
-	]
-	';'
+            [
+            | var:
+                .sVar
+                @ProcedureParam
+                [
+                | ',':
+                | *:
+                    >
+                ]
+            | ')':
+                >
+            | * :
+                @ProcedureParam
+                [
+                | ',':
+                | *:
+                    >
+                ]
+            ]}
+        | '*':
+        ]
+
+
+%		    % formal parameter identifier
+%		    [
+%			| 'var':
+%			    pIdentifier  .sIdentifier
+%			    .sVar
+%			| pIdentifier:
+%			    .sIdentifier
+%                ':'
+%                %type identifier
+%                pIdentifier .sIdentifier
+%            | ',':
+%            | *:
+%                >
+%		    ]
+%		    ':'
+%		    % type identifier
+%		    [
+%			| ',':
+%			| *:
+%			    >
+%		    ]
+%		}
+%		')'
+%	    | *:
+%	]
+%	';'
 	.sParmEnd;
+
+ProcedureParam :
+    pIdentifier
+    .sIdentifier
+    ':'
+    @TypeBody
 
 Statement :
 	[
