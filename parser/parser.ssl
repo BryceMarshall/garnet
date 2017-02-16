@@ -308,7 +308,7 @@ ProcedureHeading :
 	    | '(':
 		{
             [
-            | var:
+            | 'var':
                 .sVar
                 @ProcedureParam
                 [
@@ -362,7 +362,7 @@ ProcedureParam :
     pIdentifier
     .sIdentifier
     ':'
-    @TypeBody
+    @TypeBody;
 
 Statement :
 	[
