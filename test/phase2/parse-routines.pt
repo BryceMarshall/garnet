@@ -2,5 +2,6 @@ using progName
 def P()
     var a: integer
     a = 2
+end
 var b: integer
 b = 2
