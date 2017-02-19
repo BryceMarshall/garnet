@@ -3,6 +3,6 @@ module M
     var a: integer
     a = 2
 end
-var b ; integer
+var b : integer
 b = 2
 
