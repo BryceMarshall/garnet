@@ -143,6 +143,9 @@ Output :
 
 rules
 
+% Changed Program rule to use 'using' keyword with 
+% multiple arguments, removed program parameters,
+% and added a call to parse declarations as well as statements.
 Program :
 	'using' .sProgram
 	pIdentifier .sIdentifier
@@ -162,33 +165,40 @@ Block :
     % (constants, types, vars, and procedures), so we
     % preserve this along with our new declarations.
 	{[
-	    | 'val':
-		.sConst
-		@ConstantDefinitions
+	    | 'val':        %Changed 'const' to 'val'
+		    .sConst
+		    @ConstantDefinitions
 	    | 'type':
-		.sType
-		@TypeDefinitions
+		    .sType
+		    @TypeDefinitions
 	    | 'var':
-		.sVar
-		@VariableDeclarations
-	    | 'def':
-		.sProcedure
-		% procedure name
-		[
-		    | pStar :
-			pIdentifier .sIdentifier .sPublic
-		    | pIdentifier :
-			.sIdentifier
-		]
-		@ProcedureHeading
-		@Block
-		@BlockStatements
+		    .sVar
+		    @VariableDeclarations
+	    | 'def':        %Changed 'procedure' to 'def'
+		    .sProcedure
+		    % parse procedure name here, 
+            % with optional '*' to denote a public method
+		    [
+		        | pStar :
+		    	pIdentifier .sIdentifier .sPublic
+		        | pIdentifier :
+		    	.sIdentifier
+		    ]
+		    @ProcedureHeading
+            % This will handle the nested nature of 
+            % function declarations and statements
+		    @Block
+		    @BlockStatements
 	    | 'module':
-		.sModule
-		pIdentifier .sIdentifier
-		@Block
-		@BlockStatements
+		    .sModule
+		    pIdentifier .sIdentifier
+            % This will handle the nested nature of 
+            % module declarations and statements
+		    @Block
+		    @BlockStatements
 	    | *:
+        % The next token is not part of a declaration, 
+        % so end declarations
 		>
 	]};
 
@@ -214,7 +224,7 @@ ProgramStatements :
     .sEnd;
 
 ConstantDefinitions :
-	% Accept one or more named constant definitions
+	% Accept exactly one named constant definition 
 	pIdentifier  .sIdentifier
 	@ConstantValue;
 
@@ -243,7 +253,7 @@ UnsignedIntegerConstant :
 	];
 
 TypeDefinitions :
-	% Accept one or more named type definitions.
+	% Accept exactly one named type definition.
 	pIdentifier  .sIdentifier
 	':'  @TypeBody;
 
@@ -294,7 +304,8 @@ OptionallySignedIntegerConstant :
 	];
 
 VariableDeclarations :
-	% Accept one or more variable declarations.
+	% Accept one or more variable names, and declare them all to be
+    % a single type
 	pIdentifier  .sIdentifier
 	{[
 	    | pComma: pIdentifier .sVar .sIdentifier
@@ -308,16 +319,22 @@ ProcedureHeading :
 	    | '(':
 		{
             [
+            % If parameter is preceded by 'var', 
+            % consume it and check if another exists
             | 'var':
                 .sVar
                 @ProcedureParam
                 [
                 | ',':
+                % Go into the next iteration, 
+                % as another parameter is expected
                 | *:
                     >
                 ]
             | ')':
                 >
+            % If parameter is not preceded by 'var',
+            % consume it and check if another exists
             | * :
                 @ProcedureParam
                 [
@@ -328,41 +345,14 @@ ProcedureHeading :
             ]}
         | '*':
         ]
-
-
-%		    % formal parameter identifier
-%		    [
-%			| 'var':
-%			    pIdentifier  .sIdentifier
-%			    .sVar
-%			| pIdentifier:
-%			    .sIdentifier
-%                ':'
-%                %type identifier
-%                pIdentifier .sIdentifier
-%            | ',':
-%            | *:
-%                >
-%		    ]
-%		    ':'
-%		    % type identifier
-%		    [
-%			| ',':
-%			| *:
-%			    >
-%		    ]
-%		}
-%		')'
-%	    | *:
-%	]
-%	';'
 	.sParmEnd;
 
+% New rule, handles parameters for routines.
 ProcedureParam :
-    pIdentifier
+    pIdentifier     % Consume name of parameter
     .sIdentifier
     ':'
-    @TypeBody;
+    @TypeBody;      % Consume type of parameter
 
 Statement :
 	[
