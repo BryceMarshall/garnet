@@ -592,6 +592,7 @@ SimpleExpression :
 	]};
 
 Term :
+    %Term now calls SubTerm to account for the new precedence level of $
 	@SubTerm
 	{[
 	    | '*':
@@ -607,6 +608,7 @@ Term :
 		.sInfixAnd  
         @SubTerm 
         .sAnd
+        %Added new index operator at mid-precedence
         | '?':
         @SubTerm
         .sIndex
@@ -614,9 +616,11 @@ Term :
 		>
 	]};
 
+%New rule to allow for new precedence level of $ operator
 SubTerm :
     @Factor
     {[
+        %$ operator can take SimpleExpression operators as its parameters
         | '$':
     		@SimpleExpression
     		'..'
@@ -638,6 +642,7 @@ Factor :
 	    | '!':
 		@Factor
 		.sNot
+        %Added new length operator at highest precedence level
         | '#':
         @Factor
         .sLength
