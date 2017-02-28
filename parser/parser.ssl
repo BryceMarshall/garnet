@@ -354,6 +354,13 @@ ProcedureParam :
     ':'
     @TypeBody;      % Consume type of parameter
 
+
+% Removed recognition of the "begin" keyword to open a scope block,
+% as well as recognition of the "repeat" keyword to begin a repeat
+% statement. Added recognition of the "unless" and "do" keywords to
+% begin unless and do statements, respectively. Output an sEnd token
+% after the rule in addition to the sBegin/sEnd that enclose the
+% statement's block.
 Statement :
 	[
 	    | pIdentifier:
@@ -372,6 +379,7 @@ Statement :
 	]
     .sEnd;
 
+% Changed references to assignment operator from := to =
 AssignmentOrCallStmt :
 	[
 	    | '=':
@@ -421,6 +429,10 @@ CallStmt :
 	]
 	.sParmEnd;
 
+% Enter a scope block, matching statements until the "end" keyword is
+% matched. Emit an implicit sBegin token, and emit an sEnd upon reaching
+% the "end" keyword. This rule is used in cases where only an "end"
+% keyword provides the valid syntax required to close the scope.
 BlockStatements :
 	.sBegin
 	{[
@@ -431,16 +443,15 @@ BlockStatements :
         @Statement
 	]};
 
-%	{
-%	    @Statement
-%	    [
-%		| ';':
-%		| 'end':
-%		    .sEnd
-%		    >
-%	    ]
-%	};
-
+% Automatically output sBegin due to removal of the explicit "begin" keyword.
+% First handle the three separate cases that will cause the statement block
+% to close, and match a statement otherwise. The three cases are:
+% 1. if the "end" keyword occurs, output sEnd and leave the rule
+% 2. if the "else" keyword occurs, output sEnd and sElse, then call
+%    BlockStatements to output a "sBegin/statements/sEnd" sequence
+% 3. if the "elsif" keyword occurs, output sEnd, sElse, and sBegin,
+%    then call IfStmt to handle the expression as nested if statement
+%    within the else case
 IfStmt :
 	.sIfStmt
 	@Expression
@@ -466,6 +477,13 @@ IfStmt :
 	    @Statement
 	]};
 
+% Added this rule to handle "unless" statements, which are simple negated
+% if statements. Because of this, they have no "else" or "elsif" rules
+% and can be handled as a simple negated if statement. They are output
+% identically to an if statement, with an sNot token included after the
+% expression (which will negate the expression in postfix), and the
+% simple BlockStatements rule is used to match statements until the
+% "end" keyword is hit.
 UnlessStmt :
     .sIfStmt
     @Expression
@@ -474,6 +492,12 @@ UnlessStmt :
     'then' .sThen
     @BlockStatements;
 
+% Parsing of the "of" keyword was removed, as it is no longer used
+% in Garnet's case statement syntax. Calls to the CaseAlternative rule
+% were changed, now entering the rule only upon matching the "when"
+% keyword, and entering the CaseDefault rule upon matching "else".
+% An "end" keyword also allows for the existence of an empty switch,
+% which is valid Garnet syntax.
 CaseStmt :
 	.sCaseStmt
 	@Expression
@@ -485,7 +509,7 @@ CaseStmt :
 		% at the end of the list of case alternatives.
 		[
 		    | 'when':
-            	    @CaseAlternative
+            @CaseAlternative
 		    | 'else':
 		    @CaseDefault
 		    | 'end':
@@ -493,10 +517,15 @@ CaseStmt :
 	]
 	.sCaseEnd;
 
+% Case alternatives were changed to call the CaseAlternative rule
+% until the "else" keyword is matched, in which case the CaseDefault
+% rule is used in a one-way fashion (that is, zero or more "when"
+% cases can be contained in a switch before an "else" case).
+% The rule now also allows for empty case bodies, containing zero
+% statements, which is also valid Garnet due to the presence of
+% the "end" keyword.
 CaseAlternative :
-	% A case alternative is a statement labelled by
-	% one or more optionally signed integer constants
-
+	% A case alternative is a statement labelled by the "when" keyword
 	{
 	    @OptionallySignedIntegerConstant
 	    [
@@ -524,6 +553,9 @@ CaseAlternative :
 	    @Statement
 	]};
 
+% The default case statement is handled by the BlockStatements
+% rule, repeatedly matching and outputting statement sequences
+% until an "end" keyword is reached.
 CaseDefault :
     @BlockStatements;
 
@@ -534,6 +566,11 @@ WhileStmt :
 	'do'
 	@BlockStatements;
 
+% PT's "repeat" statement was removed and replaced with Garnet's
+% "do" statement. This generalized loop allows for an optional
+% block of statements, followed by a required "break if" statement
+% (which contains an expression representing the break condition),
+% and a second optional block of statements.
 DoStmt :
 	.sDo
 	.sBegin
@@ -544,13 +581,11 @@ DoStmt :
 		 .sBreakIf
 		 @Expression
 		 .sExpnEnd
-		 .sBegin
-		    >
-	    | ';':
+		 @BlockStatements
+		 >
 	    |*:
 	    @Statement
 	]}
-	.sEnd
 	.sExpnEnd;
 
 Expression :
