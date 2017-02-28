@@ -478,19 +478,28 @@ IfStmt :
 	]};
 
 % Added this rule to handle "unless" statements, which are simple negated
-% if statements. Because of this, they have no "else" or "elsif" rules
-% and can be handled as a simple negated if statement. They are output
-% identically to an if statement, with an sNot token included after the
-% expression (which will negate the expression in postfix), and the
-% simple BlockStatements rule is used to match statements until the
-% "end" keyword is hit.
+% if statements. They are output nearly identically to an if statement,
+% with an sNot token included after the expression (which will negate
+% the expression in postfix), and the 'elsif' logic removed.
 UnlessStmt :
     .sIfStmt
     @Expression
     .sNot
     .sExpnEnd
     'then' .sThen
-    @BlockStatements;
+    .sBegin
+    {[
+        | 'else':
+        .sEnd
+        .sElse
+        @BlockStatements
+        >
+        | 'end':
+        .sEnd
+        >
+        |*:
+        @Statement
+    ]};
 
 % Parsing of the "of" keyword was removed, as it is no longer used
 % in Garnet's case statement syntax. Calls to the CaseAlternative rule
