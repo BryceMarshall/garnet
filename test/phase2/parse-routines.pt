@@ -3,5 +3,14 @@ def P()
     var a: integer
     a = 2
 end
+def * Q(var a: integer)
+   var b: integer
+   b = a + 2
+end
+def Q(var a: integer, var b: integer)
+   var b: integer
+   b = a + 2
+end
+
 var b: integer
 b = 2
