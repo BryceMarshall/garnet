@@ -184,6 +184,7 @@ Block :
 		        | pIdentifier :
 		    	.sIdentifier
 		    ]
+		    '('
 		    @ProcedureHeading
             % This will handle the nested nature of 
             % function declarations and statements
@@ -316,36 +317,31 @@ VariableDeclarations :
 ProcedureHeading :
 	% Accept zero or more procedure formal parameter declarations.
 	[
-	    | '(':
-		{
-            [
-            % If parameter is preceded by 'var', 
-            % consume it and check if another exists
-            | 'var':
-                .sVar
-                @ProcedureParam
-                [
-                | ',':
-                % Go into the next iteration, 
-                % as another parameter is expected
-                | *:
-                    >
-                ]
-            | ')':
-                >
-            % If parameter is not preceded by 'var',
-            % consume it and check if another exists
-            | * :
-                @ProcedureParam
-                [
-                | ',':
-                | *:
-                    >
-                ]
-            ]}
-        | '*':
-        ]
-	.sParmEnd;
+		%Accept a var-preceded parameter
+		| 'var' :
+			.sVar
+			@ProcedureParam
+			%Check if another parameter exists
+	 		[ | ',' :
+				@ProcedureHeading
+			  | ')':
+				.sParmEnd
+	 		  |* :
+	 		]
+		%Accept header with no parameters
+		| ')' :
+			.sParmEnd
+		%Accept other parameters
+		| * :
+			%Check if another parameter exists
+			@ProcedureParam
+	 		[ | ',' :
+				@ProcedureHeading
+			  | ')':
+				.sParmEnd
+	 		  |* :
+	 		]
+	 ];
 
 % New rule, handles parameters for routines.
 ProcedureParam :
@@ -511,11 +507,6 @@ CaseStmt :
 	.sCaseStmt
 	@Expression
 	.sExpnEnd
-	[
-	    | ';':
-		% since case alternatives cannot be null, allow
-		% for the common situation of an extra semicolon
-		% at the end of the list of case alternatives.
 		[
 		    | 'when':
             @CaseAlternative
@@ -523,7 +514,6 @@ CaseStmt :
 		    @CaseDefault
 		    | 'end':
 		]
-	]
 	.sCaseEnd;
 
 % Case alternatives were changed to call the CaseAlternative rule
