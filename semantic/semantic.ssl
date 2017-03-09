@@ -51,8 +51,6 @@ Input :
 	sThen
 	sElse
 	sWhileStmt
-	sRepeatStmt
-	sRepeatEnd
 	sEq
 	sNE
 	sLT
@@ -70,8 +68,14 @@ Input :
 	sAnd
 	sNot
 	sNewLine
-	sEndOfFile
-	lastInputToken = sEndOfFile;
+    sPublic
+    sModule
+    sDo
+    sBreakIf
+    sSubstring
+    sLength
+    sIndex
+	lastInputToken = sIndex;
 
 Output :	% corresponds to coder.ssl input
 	tMultiply 
