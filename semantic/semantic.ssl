@@ -1767,18 +1767,19 @@ WhileStmt :
 	oFixPopForwardBranch;
 
 RepeatStmt :
-	.tRepeatBegin
+	.tDoBegin
 	oFixPushTargetAddress		% top-of-loop branch target
-	{[
-	    | sRepeatEnd:
-		>
-	    | *:
-		@Statement
-	]}
-	.tRepeatControl
+    @Statement
+    .tDoBreakIf
 	@BooleanControlExpression
-	.tRepeatTest
-	oFixPopTargetAddress;
+	.tDoTest
+	oFixPushForwardBranch
+	oEmitNullAddress		% exit branch
+	oFixSwap		% top-of-loop target back on top
+    @Statement
+    .tDoEnd
+	oFixPopTargetAddress
+    oFixPopForwardBranch;
 
 CaseStmt :
 	.tCaseBegin
