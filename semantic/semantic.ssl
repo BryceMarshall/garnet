@@ -314,7 +314,9 @@ type SymbolKind :
 	syFunction
 	syExternal
 	syExpression
-	syUndefined;
+	syUndefined
+	syModule
+	syPublicProcedure;
 
 type StdRoutine :
 	rtReset = 1
@@ -842,6 +844,8 @@ Block :
 		@TypeDefinitions
 	    | sVar:
 		@VariableDeclarations
+	    | sModule: 		% Add handling for modules
+		@ModuleDeclarations
 	    | *:
 		>
 	]}
@@ -1526,6 +1530,9 @@ ProcedurePrologue :
 	]}
 	oTypeStkEnterParameterCount	% In procedure's type entry
 	oCountPop;
+
+ModuleDeclaration :
+	> % placeholder
 
 Statement :
 	[
