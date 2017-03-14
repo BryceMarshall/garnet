@@ -1811,7 +1811,6 @@ CaseStmt :
         .tCaseElse
         @ElseCase
         | *:
-        >
     ]
 	% emit merge branches for case alternatives
 	{[ oCountChoose		% number of case alternatives
