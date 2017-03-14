@@ -1800,6 +1800,9 @@ CaseStmt :
 	{[
 	    | sCaseEnd:
 		>
+        | sElse:
+        .tCaseElse
+        @ElseCase
 	    | *:
 		@CaseAlternative
 	]}
@@ -1877,6 +1880,13 @@ CaseAlternative :
 	oFixSwap			% keep case select branch on top
 	oCountIncrement;
 
+ElseCase:
+	@Statement
+	.tCaseMerge
+	oFixPushForwardBranch
+	oEmitNullAddress		% merge branch at end of statement
+	oFixSwap			% keep case select branch on top
+	oCountIncrement;
 
 Expression :
 	% Expressions have been converted to postfix form by the
