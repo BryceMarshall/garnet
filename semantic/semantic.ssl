@@ -1800,15 +1800,19 @@ CaseStmt :
 	{[
 	    | sCaseEnd:
 		>
-        | sElse:
-        .tCaseElse
-        @ElseCase
 	    | *:
 		@CaseAlternative
 	]}
 	.tCaseEnd
 	oFixPopForwardBranch
 	oEmitCaseBranchTable
+    [
+        | sElse:
+        .tCaseElse
+        @ElseCase
+        | *:
+        >
+    ]
 	% emit merge branches for case alternatives
 	{[ oCountChoose		% number of case alternatives
 	    | zero:
