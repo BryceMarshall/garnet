@@ -18,6 +18,7 @@
 Input :
 	sIdentifier 
 	firstInputToken = sIdentifier
+    firstSemanticToken = sIdentifier
 	firstCompoundSemanticToken = sIdentifier
 	sInteger
 	sLiteral
