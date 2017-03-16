@@ -2061,7 +2061,22 @@ BinaryOperator :
 		| sIndex:
 		.tIndex
 		oTypeStkPush(tpInteger) % result type
-		@CompareOperandAndResultTypes
+		oTypeStkSwap
+		[ oTypeStkChooseKind    % second operand must be a string
+		    | tpString:
+		    | *:
+		    #eTypeMismatch
+		]
+		oTypeStkPop
+		oTypeStkSwap
+        [ oTypeStkChooseKind    % first operand must be a string
+            | tpString:
+            | *:
+            #eTypeMismatch
+        ]
+        oTypeStkPop             % only result type remains
+        oSymbolStkPop
+        oSymbolStkSetKind(syExpression)
 	    | *:
 	];
 
