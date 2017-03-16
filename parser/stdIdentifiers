@@ -2,6 +2,8 @@
 %   The total number of keywords and predeclared identifiers in this file
 %   must be the same as the value of numberStdIdentifiers in parser.pt
 
+% (Revised 5 Jan 2017 for Garnet)
+
 % Language keywords 
 %   These must be in the exact same order as the keyword token definitions 
 %   in the Output section of scan.ssl and the Input section of parser.ssl
@@ -10,27 +12,54 @@ div
 mod
 or
 and
+%%%%%%%%%% DELETED
+% not
+%%%%%%%%%%
 then
 else
 of
 end
+%%%%%%%%%% DELETED
+% until
+%%%%%%%%%%
 do
 array
 file
 packed
-var
-type
-if
-case
-while
+%%%%%%%%%% CHANGED
+% program
+% const
+%%%%%%%%%%
 using
 val
+%%%%%%%%%%
+var
+type
+%%%%%%%%%% CHANGED
+% procedure
+%%%%%%%%%%
 def
+%%%%%%%%%%
+%%%%%%%%%% DELETED
+% begin
+%%%%%%%%%%
+if
+%%%%%%%%%% ADDED
 unless
+%%%%%%%%%% 
+case
+while
+%%%%%%%%%% CHANGED
+% repeat
+%%%%%%%%%%
 elsif
 break
 when
 module
+%%%%%%%%%%
+%%%%%%%%%% ADDED 858
+return
+%%%%%%%%%%
 
 % End of keywords
 
@@ -40,7 +69,11 @@ module
 
 % Predeclared type names
 integer
+%%%%%%%%%% CHANGED
+% char
+%%%%%%%%%%
 string
+%%%%%%%%%%
 boolean
 text
 

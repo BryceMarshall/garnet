@@ -1,7 +1,10 @@
 % PT Scanner.ssl   Ver. 1.04
 %
 % Date:  30 Jun 1980
-%	(revised 30 Dec 2016)
+%	 (revised 30 Dec 2016)
+%%%%%%%%%%% ADDED 
+%	 (revised 5 Jan 2017 for Garnet)
+%%%%%%%%%%% 
 %
 % Author:  Alan Rosselet
 %
@@ -25,6 +28,13 @@ Input :
 	lDot		'.'
 	lComma		','
 	lSemicolon	';'
+%%%%%%%%%%% ADDED 
+	lPercent	'%'
+	lHash		'#'
+	lExclamation	'!'
+	lQuestion	'?'
+	lDollar		'$'
+%%%%%%%%%%% 
 	lQuote
 	lLeftAngle	'<'
 	lRightAngle	'>'
@@ -32,11 +42,8 @@ Input :
 	lRightParen	')'
 	lLeftBracket	'['
 	lRightBracket	']'
-	lPercent '%'
-	lHash    '#'
-	lExclamation '!'
-	lQuestion '?'
-    	lDollar '$'
+	lLeftBrace	'{'
+	lRightBrace	'}'
 	lBlank
 	lIllegal
 	lNewLine
@@ -55,28 +62,61 @@ Output :
 	pMod
 	pOr
 	pAnd
+%%%%%%%%%%% DELETED
+%	pNot
+%%%%%%%%%%% 
 	pThen
 	pElse
 	pOf
 	pEnd
+%%%%%%%%%%% DELETED
+%	pUntil
+%%%%%%%%%%% 
 	pDo
 	pArray
 	pFile
 	pPacked
-	pVar
-	pType
-	pIf
-	pCase
-	pWhile
+%%%%%%%%%%% CHANGED
+%	pProgram
+%	pConst
+%%%%%%%%%%% 
 	pUsing
 	pVal
+%%%%%%%%%%% 
+	pVar
+	pType
+%%%%%%%%%%% CHANGED
+%	pProcedure
+%%%%%%%%%%% 
 	pDef
+%%%%%%%%%%% 
+%%%%%%%%%%% DELETED
+%	pBegin
+%%%%%%%%%%%
+	pIf
+%%%%%%%%%%% ADDED
 	pUnless
+%%%%%%%%%%% 
+	pCase
+	pWhile
+%%%%%%%%%%% CHANGED
+%	pRepeat
+%%%%%%%%%%% 
 	pElsif
 	pBreak
 	pWhen
 	pModule
-	lastKeywordToken = pModule
+%%%%%%%%%%% 
+%%%%%%%%%%% ADDED 858
+	pReturn
+%%%%%%%%%%% 
+%%%%%%%%%%% CHANGED 458
+%	lastKeywordToken = pRepeat
+%%%%%%%%%%% CHANGED 858
+%	lastKeywordToken = pModule
+%%%%%%%%%%% 
+	lastKeywordToken = pReturn
+%%%%%%%%%%% 
 
 	% Scanner tokens -
 	%   These are the tokens actually recognized by the Scanner itself.
@@ -96,9 +136,19 @@ Output :
 	pPlus
 	pMinus
 	pStar
+%%%%%%%%%%% DELETED
+%	pColonEquals
+%%%%%%%%%%% 
 	pDot
 	pComma
 	pSemicolon
+%%%%%%%%%%% ADDED
+	pEqualsEquals
+	pNot
+	pQuestion
+	pDollar
+	pHash
+%%%%%%%%%%% 
 	pColon
 	pEquals
 	pNotEqual
@@ -111,12 +161,7 @@ Output :
 	pLeftBracket
 	pRightBracket
 	pDotDot
-    pDoubleEquals
-    pNot
-    pQuestion
-    pDollar
-    pHash
-	lastSyntaxToken = pHash;
+	lastSyntaxToken = pDotDot;
 
 Error :
 	eIllegalChar = 5
@@ -154,7 +199,16 @@ Scan :
 	    | ';':
 		.pSemicolon
 	    | '(':
-	    .pLeftParen
+%%%%%%%%%%% CHANGED
+%		[
+%		    | '*':
+%			@AlternateComment
+%		    | *:
+%			.pLeftParen
+%		]
+%%%%%%%%%%% 
+		.pLeftParen
+%%%%%%%%%%% 
 	    | ')':
 		.pRightParen
 	    | '[':
@@ -164,7 +218,16 @@ Scan :
 	    | ',':
 		.pComma
 	    | ':':
+%%%%%%%%%%% CHANGED 
+%		[
+%		    | '=':
+%			.pColonEquals
+%		    | *:
+%			.pColon
+%		]
+%%%%%%%%%%% 
 		.pColon
+%%%%%%%%%%% 
 	    | lDigit:
 		oBufferSave
 		@Integer
@@ -176,12 +239,16 @@ Scan :
 		    | *:
 		]
 	    | '=':
-        [
-            | '=':
-            .pDoubleEquals
-            | *:
-		    .pEquals
-        ]
+%%%%%%%%%%% CHANGED 
+%		.pEquals
+%%%%%%%%%%% 
+		[
+		    | '=':
+			.pEqualsEquals
+		    | *:
+			.pEquals
+		]
+%%%%%%%%%%% 
 	    | '+':
 		.pPlus
 	    | lQuote:
@@ -197,18 +264,15 @@ Scan :
 		]
 	    | '<':
 		[
+%%%%%%%%%%% DELETED 
+%		    | '>':
+%			.pNotEqual
+%%%%%%%%%%% 
 		    | '=':
 			.pLessEqual
 		    | *:
 			.pLess
 		]
-        | '!':
-        [
-            | '=' :
-            .pNotEqual
-            | * :
-            .pNot
-        ]
 	    | '>':
 		[
 		    | '=':
@@ -216,20 +280,34 @@ Scan :
 		    | *:
 			.pGreater
 		]
-        | '%':
-        @Comment
+%%%%%%%%%%% CHANGED
+%	    | '{':
+%		@Comment
+%%%%%%%%%%% 
+	    | '%':
+		@Comment
+%%%%%%%%%%% 
 	    | '*':
 		.pStar
-        | '?':
-        .pQuestion
-        | '$':
-        .pDollar
-        | '#':
-        .pHash
+%%%%%%%%%%% ADDED 
+	    | '!':
+		[
+		    | '=':
+			.pNotEqual
+		    | *:
+			.pNot
+		]
+	    | '?':
+		.pQuestion
+	    | '$':
+		.pDollar
+	    | '#':
+		.pHash
+%%%%%%%%%%% 
 	    | lNewPage:
 	    | lEndFile:
 		.pEndFile
-	    | *:
+	    | *: 
 		?
 		#eIllegalChar
 	]};
@@ -261,8 +339,13 @@ Literal :
 
 	{[
 	    | lQuote:
-        .pLiteral
-        >
+		[
+		    | lQuote:
+			oBufferSave
+		    | *:
+			.pLiteral
+			>
+		]
 	    | lNewLine:		% literal must not cross a line boundary
 		#eLiteralLine
 		.pNewLine
@@ -280,14 +363,41 @@ Comment :
 	% Discard the contents of a comment
 
 	{[
-	    | lNewLine:     % comments are closed by a newline
+%%%%%%%%%%% DELETED
+%	    | '}':
+%		>
+%%%%%%%%%%%
+	    | lNewLine:
 		.pNewLine
+%%%%%%%%%%% ADDED
 		>
-	    | lEndFile:     % comments need not be closed before EOF
+%%%%%%%%%%%
+	    | lEndFile:		% comment must be closed before EOF
+		#eCommentEOF
 		.pEndFile
 		>
 	    | *:	% comment may contain any other character
 		?
 	]};
+
+%%%%%%%%%%% DELETED
+% AlternateComment :
+%	 {[
+%	     | '*':
+%		 [
+%		     | ')':
+%			 >
+%		     | *:
+%		 ]
+%	     | lNewLine:
+%		 .pNewLine
+%	     | lEndFile:
+%		 #eCommentEOF
+%		 .pEndFile
+%		 >
+%	     | *:
+%		 ?
+%	 ]};
+%%%%%%%%%%% 
 
 end
