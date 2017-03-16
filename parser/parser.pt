@@ -2,6 +2,9 @@
 
   Date:  30 Jun 1980
 	 (revised 15 Dec 2015)
+(********** ADDED *)
+	 (revised 5 Jan 2017 for Garnet)
+(**********)
 
   Author:  Alan Rosselet      
 
@@ -48,6 +51,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 
 { ===== Character classes (scanner input tokens), copied here from scan.def }
 
+(********** CHANGED *)
 	{ Input Tokens }
 	lLetter = 0;
 	firstCharClass = 0;
@@ -60,26 +64,28 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	lDot = 7;
 	lComma = 8;
 	lSemicolon = 9;
-	lQuote = 10;
-	lLeftAngle = 11;
-	lRightAngle = 12;
-	lLeftParen = 13;
-	lRightParen = 14;
-	lLeftBracket = 15;
-	lRightBracket = 16;
-	lPercent = 17;
-	lHash = 18;
-	lExclamation = 19;
-	lQuestion = 20;
-	lDollar = 21;
-	lBlank = 22;
-	lIllegal = 23;
-	lNewLine = 24;
-	lTab = 25;
-	lNewPage = 26;
-	lEndFile = 27;
-	lastCharClass = 27;
-	
+	lPercent = 10;
+	lHash = 11;
+	lExclamation = 12;
+	lQuestion = 13;
+	lDollar = 14;
+	lQuote = 15;
+	lLeftAngle = 16;
+	lRightAngle = 17;
+	lLeftParen = 18;
+	lRightParen = 19;
+	lLeftBracket = 20;
+	lRightBracket = 21;
+	lLeftBrace = 22;
+	lRightBrace = 23;
+	lBlank = 24;
+	lIllegal = 25;
+	lNewLine = 26;
+	lTab = 27;
+	lNewPage = 28;
+	lEndFile = 29;
+	lastCharClass = 29;
+(**********)
 
 { ===== }
 
@@ -90,10 +96,10 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	{ Nonexistent input token used only in syntax error recovery }
 	pSyntaxError = -1;
 
-{ ===== Scanner -> Parser token stream definitions (scanner output tokens),
+{ ===== Scanner -> Parser token stream defintiions (scanner output tokens),
 	copied here from scan.def or parser.def, which must agree!}
 
-
+(********** CHANGED *)
 	{ Output Tokens }
 	pDiv = 0;
 	firstKeywordToken = 0;
@@ -108,51 +114,53 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	pArray = 9;
 	pFile = 10;
 	pPacked = 11;
-	pVar = 12;
-	pType = 13;
-	pIf = 14;
-	pCase = 15;
-	pWhile = 16;
-	pUsing = 17;
-	pVal = 18;
-	pDef = 19;
-	pUnless = 20;
+	pUsing = 12;
+	pVal = 13;
+	pVar = 14;
+	pType = 15;
+	pDef = 16;
+	pIf = 17;
+	pUnless = 18;
+	pCase = 19;
+	pWhile = 20;
 	pElsif = 21;
 	pBreak = 22;
 	pWhen = 23;
 	pModule = 24;
-	lastKeywordToken = 24;
-	pIdentifier = 25;
-	firstCompoundInputToken = 25;
-	pInteger = 26;
-	pLiteral = 27;
-	lastCompoundInputToken = 27;
-	pNewLine = 28;
-	pEndFile = 29;
-	pPlus = 30;
-	pMinus = 31;
-	pStar = 32;
-	pDot = 33;
-	pComma = 34;
-	pSemicolon = 35;
-	pColon = 36;
-	pEquals = 37;
-	pNotEqual = 38;
-	pLess = 39;
-	pLessEqual = 40;
-	pGreaterEqual = 41;
-	pGreater = 42;
-	pLeftParen = 43;
-	pRightParen = 44;
-	pLeftBracket = 45;
-	pRightBracket = 46;
-	pDotDot = 47;
-	pDoubleEquals = 48;
-	pNot = 49;
-	pQuestion = 50;
-	pDollar = 51;
-	pHash = 52;
-	lastSyntaxToken = 52;
+	pReturn = 25;
+	lastKeywordToken = 25;
+	pIdentifier = 26;
+	firstCompoundInputToken = 26;
+	pInteger = 27;
+	pLiteral = 28;
+	lastCompoundInputToken = 28;
+	pNewLine = 29;
+	pEndFile = 30;
+	pPlus = 31;
+	pMinus = 32;
+	pStar = 33;
+	pDot = 34;
+	pComma = 35;
+	pSemicolon = 36;
+	pEqualsEquals = 37;
+	pNot = 38;
+	pQuestion = 39;
+	pDollar = 40;
+	pHash = 41;
+	pColon = 42;
+	pEquals = 43;
+	pNotEqual = 44;
+	pLess = 45;
+	pLessEqual = 46;
+	pGreaterEqual = 47;
+	pGreater = 48;
+	pLeftParen = 49;
+	pRightParen = 50;
+	pLeftBracket = 51;
+	pRightBracket = 52;
+	pDotDot = 53;
+	lastSyntaxToken = 53;
+(**********)
 
 { ===== }
 
@@ -161,6 +169,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 
 { ===== Semantic tokens, copied here from parser.def or semantic.def, which must agree!  }
 
+(********** CHANGED *)
 	{ Output Tokens }
 	sIdentifier = 0;
 	firstSemanticToken = 0;
@@ -175,51 +184,53 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	sType = 7;
 	sVar = 8;
 	sProcedure = 9;
-	sBegin = 10;
-	sEnd = 11;
-	sNegate = 12;
-	sArray = 13;
-	sPacked = 14;
-	sFile = 15;
-	sRange = 16;
-	sCaseStmt = 17;
-	sCaseEnd = 18;
-	sLabelEnd = 19;
-	sExpnEnd = 20;
-	sNullStmt = 21;
-	sAssignmentStmt = 22;
-	sSubscript = 23;
-	sCallStmt = 24;
-	sFieldWidth = 25;
-	sIfStmt = 26;
-	sThen = 27;
-	sElse = 28;
-	sWhileStmt = 29;
-    sEq = 30;
-    sNE = 31;
-    sLT = 32;
-    sLE = 33;
-    sGT = 34;
-    sGE = 35;
-    sAdd = 36;
-    sSubtract = 37;
-    sMultiply = 38;
-    sDivide = 39;
-    sModulus = 40;
-    sInfixOr = 41;
-    sOr = 42;
-    sInfixAnd = 43;
-    sAnd = 44;
-    sNot = 45;
-    sNewLine = 46;
-    sPublic = 47;
-    sModule = 48;
-    sDo = 49;
-    sBreakIf = 50;
-    sSubstring = 51;
-    sLength = 52;
-    sIndex = 53;
-    lastSemanticToken = 53;
+	sPublic = 10;
+	sBegin = 11;
+	sEnd = 12;
+	sNegate = 13;
+	sArray = 14;
+	sPacked = 15;
+	sFile = 16;
+	sRange = 17;
+	sCaseStmt = 18;
+	sCaseEnd = 19;
+	sLabelEnd = 20;
+	sExpnEnd = 21;
+	sNullStmt = 22;
+	sAssignmentStmt = 23;
+	sSubscript = 24;
+	sCallStmt = 25;
+	sFieldWidth = 26;
+	sIfStmt = 27;
+	sThen = 28;
+	sElse = 29;
+	sWhileStmt = 30;
+	sModule = 31;
+	sDoStmt = 32;
+	sBreakIf = 33;
+	sReturn = 34;
+	sEq = 35;
+	sNE = 36;
+	sLT = 37;
+	sLE = 38;
+	sGT = 39;
+	sGE = 40;
+	sAdd = 41;
+	sSubtract = 42;
+	sMultiply = 43;
+	sDivide = 44;
+	sModulus = 45;
+	sInfixOr = 46;
+	sOr = 47;
+	sInfixAnd = 48;
+	sAnd = 49;
+	sNot = 50;
+	sSubstring = 51;
+	sLength = 52;
+	sIndex = 53;
+	sNewLine = 54;
+	lastSemanticToken = 54;
+(**********)
 
 { ===== }
 
@@ -265,6 +276,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	eIllegalChar = 5;
 	eLiteralLine = 6;
 	eLiteralEOF = 7;
+	eCommentEOF = 8;
 	eNoSeparator = 9;
 	lastScanError = 9;
 
@@ -310,7 +322,13 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 
 	{ The following value MUST match the total number of
 	  keywords and idents entered in the stdIdentifiers file. }
-	numberStdIdentifiers = 44;
+(********** CHANGED 458 *)
+(*	numberStdIdentifiers = 43; *)
+(********** CHANGED 858 *)
+(*	numberStdIdentifiers = 44; *)
+(**********)
+	numberStdIdentifiers = 45;
+(**********)
 
 	textBufferSize = 80;
 	identTableSize = 1601;	{ must be prime }
@@ -334,7 +352,10 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	{ misc. }
 	tab = '	';
 	blank = ' ';
+(********** CHANGED *)
+(*	quote = ''''; *)
 	quote = '"';
+(**********)
 	null = 0;
 
 	{ Phase identification values - for use by common routines }
@@ -569,6 +590,8 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 			write('syntax error at: ');
 			ReportSyntaxError
 		    end;
+		eCommentEOF:
+		    write('unclosed comment');
 		eLiteralEOF:
 		    write('unclosed literal string');
 		eLiteralLine:
@@ -820,6 +843,13 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	    charClassMap[ord(',')] := lComma;
 	    charClassMap[ord('-')] := lMinus;
 	    charClassMap[ord('.')] := lDot;
+(********** ADDED *)
+	    charClassMap[ord('%')] := lPercent;
+	    charClassMap[ord('#')] := lHash;
+	    charClassMap[ord('!')] := lExclamation;
+	    charClassMap[ord('?')] := lQuestion;
+	    charClassMap[ord('$')] := lDollar;
+(**********)
 	    charClassMap[ord(':')] := lColon;
 	    charClassMap[ord(';')] := lSemicolon;
 	    charClassMap[ord('<')] := lLeftAngle;
@@ -827,11 +857,8 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	    charClassMap[ord('>')] := lRightAngle;
 	    charClassMap[ord('[')] := lLeftBracket;
 	    charClassMap[ord(']')] := lRightBracket;
-		charClassMap[ord('%')] := lPercent;
-		charClassMap[ord('#')] := lHash;
-		charClassMap[ord('!')] := lExclamation;
-		charClassMap[ord('?')] := lQuestion;
-		charClassMap[ord('$')] := lDollar;
+	    charClassMap[ord('{')] := lLeftBrace;
+	    charClassMap[ord('}')] := lRightBrace;
 
 	    { Initialize the scan ssl table }
 	    reset(scanSsl {, NscanSsl} );

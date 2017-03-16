@@ -2,6 +2,9 @@
 %
 % Date:  30 Jun 1980
 %	 (revised 7 December 2009)
+%%%%%%%%%%% ADDED 
+%	 (revised 3 Feb 2017 for Garnet) 
+%%%%%%%%%%% 
 %
 % Author:  Alan Rosselet
 %
@@ -18,35 +21,68 @@ Input :
 	% Keywords must be first both here and in stdIdentifiers,
 	% and they must appear in the same order
 
-    pDiv            'div'
+	pDiv			'div'
 	firstKeywordToken = pDiv
-	pMod            'mod'
-	pOr             'or'
-	pAnd            'and'
-	pThen           'then'
-	pElse           'else'
-	pOf             'of'
-	pEnd            'end'
-	pDo             'do'
-	pArray          'array'
-	pFile           'file'
-	pPacked         'packed'
-	pVar            'var'
-	pType           'type'
-	pIf             'if'
-	pCase           'case'
-	pWhile          'while'
-	pUsing          'using'
-	pVal            'val'
-	pDef            'def'
-	pUnless         'unless'
-	pElsif          'elsif'
-	pBreak          'break'
-	pWhen           'when'
-	pModule         'module'
-	lastKeywordToken = pModule
+	pMod			'mod'
+	pOr			'or'
+	pAnd			'and'
+%%%%%%%%%%% DELETED
+%	pNot			'not'
+%%%%%%%%%%% 
+	pThen			'then'
+	pElse			'else'
+	pOf			'of'
+	pEnd			'end'
+%%%%%%%%%%% DELETED
+%	pUntil			'until'
+%%%%%%%%%%% 
+	pDo			'do'
+	pArray			'array'
+	pFile			'file'
+	pPacked			'packed'
+%%%%%%%%%%% CHANGED
+%       pProgram		'program'
+%       pConst			'const'
+%%%%%%%%%%% 
+	pUsing			'using'
+	pVal			'val'
+%%%%%%%%%%% 
+	pVar			'var'
+	pType			'type'
+%%%%%%%%%%% CHANGED
+%       pProcedure		'procedure'
+%%%%%%%%%%% 
+	pDef			'def'
+%%%%%%%%%%% 
+%%%%%%%%%%% DELETED
+%	pBegin			'begin'
+%%%%%%%%%%%
+	pIf			'if'
+%%%%%%%%%%% ADDED
+	pUnless			'unless'
+%%%%%%%%%%% 
+	pCase			'case'
+	pWhile			'while'
+%%%%%%%%%%% CHANGED
+%       pRepeat			'repeat'
+%%%%%%%%%%% 
+	pElsif			'elsif'
+	pBreak			'break'
+	pWhen			'when'
+	pModule			'module'
+%%%%%%%%%%% 
+%%%%%%%%%%% ADDED 858
+	pReturn			'return'
+%%%%%%%%%%% 
+%%%%%%%%%%% CHANGED 458
+%	lastKeywordToken = pRepeat
+%%%%%%%%%%% CHANGED 858
+%	lastKeywordToken = pModule
+%%%%%%%%%%% 
+	lastKeywordToken = pReturn
+%%%%%%%%%%% 
 
-	pIdentifier
+	pIdentifier 
 	firstCompoundInputToken = pIdentifier
 	pInteger
 	pLiteral
@@ -57,30 +93,36 @@ Input :
 	pPlus			'+'
 	pMinus			'-'
 	pStar			'*'
+%%%%%%%%%%% DELETED
+%       pColonEquals		':='
+%%%%%%%%%%%
 	pDot			'.'
 	pComma			','
 	pSemicolon		';'
+%%%%%%%%%%% ADDED
+	pEqualsEquals		'=='
+	pNot			'!'
+	pQuestion		'?'
+	pDollar			'$'
+	pHash			'#'
+%%%%%%%%%%% 
 	pColon			':'
 	pEquals			'='
 	pNotEqual		'!='
 	pLess			'<'
 	pLessEqual		'<='
-	pGreaterEqual	'>='
+	pGreaterEqual		'>='
 	pGreater		'>'
 	pLeftParen		'('
 	pRightParen		')'
-	pLeftBracket	'['
-	pRightBracket	']'
+	pLeftBracket		'['
+	pRightBracket		']'
 	pDotDot			'..'
-    pDoubleEquals   '=='
-    pNot            '!'
-    pQuestion       '?'
-    pDollar         '$'
-    pHash           '#'
-	lastSyntaxToken = pHash;
+	lastSyntaxToken = pDotDot;
+
 
 Output :
-	sIdentifier
+	sIdentifier 
 	firstSemanticToken = sIdentifier
 	firstCompoundSemanticToken = sIdentifier
 	sInteger
@@ -94,6 +136,9 @@ Output :
 	sType
 	sVar
 	sProcedure
+%%%%%%%%%%% ADDED 
+	sPublic
+%%%%%%%%%%% 
 	sBegin
 	sEnd
 	sNegate
@@ -114,6 +159,17 @@ Output :
 	sThen
 	sElse
 	sWhileStmt
+%%%%%%%%%%% CHANGED
+%	sRepeatStmt
+%	sRepeatEnd
+%%%%%%%%%%% 
+	sModule
+	sDoStmt
+	sBreakIf
+%%%%%%%%%%% 
+%%%%%%%%%%% ADDED 858 
+	sReturn
+%%%%%%%%%%% 
 	sEq
 	sNE
 	sLT
@@ -130,104 +186,147 @@ Output :
 	sInfixAnd
 	sAnd
 	sNot
+%%%%%%%%%%% ADDED 
+	sSubstring
+	sLength
+	sIndex
+%%%%%%%%%%% 
 	sNewLine
-    sPublic
-    sModule
-    sDo
-    sBreakIf
-    sSubstring
-    sLength
-    sIndex
-	lastSemanticToken = sIndex;
+	lastSemanticToken = sNewLine;
 
 
 rules
 
-% Changed Program rule to use 'using' keyword with 
-% multiple arguments, removed program parameters,
-% and added a call to parse declarations as well as statements.
 Program :
+%%%%%%%%%%% CHANGED
+%	'program'  .sProgram
+%	% program name
+%	pIdentifier
+%%%%%%%%%%% 
 	'using' .sProgram
-	pIdentifier .sIdentifier
-	{[
-	    | ',' :
-		pIdentifier .sIdentifier
-	    | * :
-		>
-	]}
+%%%%%%%%%%% 
+	% program parameters
+%%%%%%%%%%% DELETED
+%	'('
+%%%%%%%%%%% 
+	{
+	    pIdentifier  .sIdentifier
+	    [
+		| ',':
+		| *:
+		    >
+	    ]
+	}
+%%%%%%%%%%% DELETED
+%	')'
+%%%%%%%%%%% 
 	.sParmEnd
-	@Block
-	@ProgramStatements;
-		
+%%%%%%%%%%% CHANGED
+%	';'  @Block  '.';
+%%%%%%%%%%% 
+	@Block;
+%%%%%%%%%%% 
+
+%%%%%%%%%%% CHANGED
+% Block :
+%	 % Strictly speaking, standard Pascal requires that declarations
+%	 % appear only in the order consts, types, vars, procedures.
+%	 % We allow arbitrary intermixing of these instead to preserve
+%	 % programmer sanity.
+%	 {[
+%	     | 'const':
+%		 .sConst
+%		 @ConstantDefinitions
+%	     | 'type':
+%		 .sType
+%		 @TypeDefinitions
+%	     | 'var':
+%		 .sVar
+%		 @VariableDeclarations
+%	     | 'procedure':
+%		 .sProcedure
+%		 % procedure name
+%		 pIdentifier  .sIdentifier
+%		 @ProcedureHeading
+%		 @Block  ';'
+%	     | *:
+%		 >
+%	 ]}
+%	 'begin'
+%	 @BeginStmt;
+%%%%%%%%%%% 
 Block :
-    % In Garnet, declarations must come before statements.
-    % PT Pascal allows intermixing of various declarations
-    % (constants, types, vars, and procedures), so we
-    % preserve this along with our new declarations.
+	@Declarations
+	@Statements;
+
+Declarations:
+	% Strictly speaking, standard Pascal requires that declarations
+	% appear only in the order consts, types, vars, procedures.
+	% We allow arbitrary intermixing of these instead to preserve
+	% programmer sanity.
 	{[
-	    | 'val':        %Changed 'const' to 'val'
-		    .sConst
-		    @ConstantDefinitions
+	    | 'val':
+		.sConst
+		@ConstantDefinition
 	    | 'type':
-		    .sType
-		    @TypeDefinitions
+		.sType
+		@TypeDefinition
 	    | 'var':
-		    .sVar
-		    @VariableDeclarations
-	    | 'def':        %Changed 'procedure' to 'def'
-		    .sProcedure
-		    % parse procedure name here, 
-            % with optional '*' to denote a public method
-		    [
-		        | pStar :
-		    	pIdentifier .sIdentifier .sPublic
-		        | pIdentifier :
-		    	.sIdentifier
-		    ]
-		    '('
-		    @ProcedureHeading
-            % This will handle the nested nature of 
-            % function declarations and statements
-		    @Block
-		    @BlockStatements
+		.sVar
+		@VariableDeclarations
+	    | 'def':
+		.sProcedure
+		[
+		    | '*':
+			pIdentifier  .sIdentifier 
+			.sPublic
+		    | *:
+			pIdentifier  .sIdentifier 
+		]
+		@ProcedureHeading
+%%%%%%%%%%% CHANGED 858
+%		@Block
+%%%%%%%%%%% 
+		[
+		    | ':':
+			pIdentifier .sIdentifier
+			@Block  
+		        'return' .sReturn @Expression .sExpnEnd  
+		    | *:
+			@Block  
+		]
+%%%%%%%%%%% END 858 
+		'end'
 	    | 'module':
-		    .sModule
-		    pIdentifier .sIdentifier
-            % This will handle the nested nature of 
-            % module declarations and statements
-		    @Block
-		    @BlockStatements
+		.sModule
+		pIdentifier .sIdentifier 
+		@Block
+		'end'
+	    | ';':
+		% null declaration, does nothing
 	    | *:
-        % The next token is not part of a declaration, 
-        % so end declarations
 		>
 	]};
+%%%%%%%%%%% 
 
-ProgramStatements :
-	.sBegin
-    {[
-	    | pIdentifier:
-		@AssignmentOrCallStmt
-	    | 'if':
-		@IfStmt
-		| 'unless':
-		@UnlessStmt
-	    | 'while':
-		@WhileStmt
-	    | 'case':
-		@CaseStmt
-	    | 'do':
-		@DoStmt
-        |';':
-        |*:
-        >
-    ]}
-    .sEnd;
-
-ConstantDefinitions :
-	% Accept exactly one named constant definition 
+%%%%%%%%%%% CHANGED
+% ConstantDefinitions :
+%	% Accept one or more named constant definitions
+%	pIdentifier  .sIdentifier
+%	@ConstantValue
+%	{[
+%	    | pIdentifier:
+%		.sIdentifier
+%		@ConstantValue
+%	    | *:
+%		>
+%	]};
+%%%%%%%%%%% 
+ConstantDefinition :
+	% Accept a named constant
 	pIdentifier  .sIdentifier
 	@ConstantValue;
+%%%%%%%%%%% 
 
 ConstantValue :
 	'='
@@ -243,7 +342,12 @@ ConstantValue :
 		@UnsignedIntegerConstant
 	    | pLiteral:
 		.sLiteral
-	];
+	]
+%%%%%%%%%%% CHANGED 
+%	';' ;
+%%%%%%%%%%% 
+	;
+%%%%%%%%%%% 
 
 UnsignedIntegerConstant :
 	[
@@ -253,10 +357,24 @@ UnsignedIntegerConstant :
 		.sInteger
 	];
 
-TypeDefinitions :
-	% Accept exactly one named type definition.
+%%%%%%%%%%% CHANGED
+% TypeDefinitions :
+% 	% Accept one or more named type definitions.
+%	pIdentifier  .sIdentifier
+%	'='  @TypeBody  ';'
+%	{[
+%	    | pIdentifier:
+%		.sIdentifier
+%		'='  @TypeBody  ';'
+%	    | *:
+%		>
+%	]};
+%%%%%%%%%%% 
+TypeDefinition :
+	% Accept a named type definiion
 	pIdentifier  .sIdentifier
-	':'  @TypeBody;
+	':' @TypeBody;
+%%%%%%%%%%% 
 
 TypeBody :
 	[
@@ -304,81 +422,122 @@ OptionallySignedIntegerConstant :
 		@UnsignedIntegerConstant
 	];
 
+%%%%%%%%%%% CHANGED
+% VariableDeclarations :
+%	% Accept one or more variable declarations.
+%	pIdentifier  .sIdentifier
+%	':'  @TypeBody  ';'
+%	{[
+%	    | pIdentifier:
+%		.sIdentifier
+%		':'  @TypeBody  ';'
+%	    | *:
+%		>
+%	]};
+%%%%%%%%%%% 
 VariableDeclarations :
-	% Accept one or more variable names, and declare them all to be
-    % a single type
+	% Accept one or more variable declarations.
 	pIdentifier  .sIdentifier
 	{[
-	    | pComma: pIdentifier .sVar .sIdentifier
-	    | ':' : >
+	    | ',':
+		pIdentifier .sVar .sIdentifier
+	    | *:
+		>
 	]}
-	@TypeBody;
+	':' @TypeBody;
+%%%%%%%%%%% 
 
 ProcedureHeading :
 	% Accept zero or more procedure formal parameter declarations.
+%%%%%%%%%%% CHANGED
+%	[
+%	    | '(':
+%%%%%%%%%%% 
+	'('
+%%%%%%%%%%% 
 	[
-		%Accept a var-preceded parameter
-		| 'var' :
-			.sVar
-			@ProcedureParam
-			%Check if another parameter exists
-	 		[ | ',' :
-				@ProcedureHeading
-			  | ')':
-				.sParmEnd
-	 		  |* :
-	 		]
-		%Accept header with no parameters
-		| ')' :
-			.sParmEnd
-		%Accept other parameters
-		| * :
-			%Check if another parameter exists
-			@ProcedureParam
-	 		[ | ',' :
-				@ProcedureHeading
-			  | ')':
-				.sParmEnd
-	 		  |* :
-	 		]
-	 ];
+	    | ')':
+	    | *:
+		{
+		    % formal parameter identifier
+		    [
+			| 'var':
+			    pIdentifier  .sIdentifier
+			    .sVar
+			| *:
+			    pIdentifier  .sIdentifier
+		    ]
+		    ':'
+		    % type identifier
+		    pIdentifier  .sIdentifier
+		    [
+%%%%%%%%%%% CHANGED
+%		       | ';':
+%%%%%%%%%%% 
+			| ',':
+%%%%%%%%%%% 
+			| *:
+			    >
+		    ]
+		}
+		')'
+%%%%%%%%%%% DELETED
+%	    | *:
+%%%%%%%%%%% 
+	]
+%%%%%%%%%%% DELETED
+%       ';'
+%%%%%%%%%%% 
+	.sParmEnd;
 
-% New rule, handles parameters for routines.
-ProcedureParam :
-    pIdentifier     % Consume name of parameter
-    .sIdentifier
-    ':'
-    @TypeBody;      % Consume type of parameter
-
-
-% Removed recognition of the "begin" keyword to open a scope block,
-% as well as recognition of the "repeat" keyword to begin a repeat
-% statement. Added recognition of the "unless" and "do" keywords to
-% begin unless and do statements, respectively. Output an sEnd token
-% after the rule in addition to the sBegin/sEnd that enclose the
-% statement's block.
-Statement :
-	[
+% Statement :
+%	[
+%	    | pIdentifier:
+%		@AssignmentOrCallStmt
+%	    | 'begin':
+%		@BeginStmt
+%	    | 'if':
+%		@IfStmt
+%	    | 'while':
+%		@WhileStmt
+%	    | 'case':
+%		@CaseStmt
+%	    | 'repeat':
+%		@RepeatStmt
+%	    | *:
+%		.sNullStmt
+%	];
+%%%%%%%%%%% 
+Statements :
+	.sBegin
+	{[
 	    | pIdentifier:
-		@AssignmentOrCallStmt
+		@AssignmentOrCallStmt 
 	    | 'if':
 		@IfStmt
-		| 'unless':
+	    | 'unless':
 		@UnlessStmt
-	    | 'while':
-		@WhileStmt
 	    | 'case':
 		@CaseStmt
+	    | 'while':
+		 @WhileStmt
 	    | 'do':
 		@DoStmt
-        |';':
-	]
-    .sEnd;
+	    | ';':
+		% null statement, does nothing
+	    | *:
+		>
+	]}
+	.sEnd;
+%%%%%%%%%%% 
 
-% Changed references to assignment operator from := to =
 AssignmentOrCallStmt :
 	[
+%%%%%%%%%%% CHANGED 
+%	    | ':=':
+%%%%%%%%%%% 
 	    | '=':
+%%%%%%%%%%% 
 		.sAssignmentStmt
 		.sIdentifier	% identifier accepted in the Statement rule
 		@Expression
@@ -389,7 +548,11 @@ AssignmentOrCallStmt :
 		.sSubscript
 		@Expression
 		.sExpnEnd
+%%%%%%%%%%% CHANGED 
+%		']'  ':='
+%%%%%%%%%%%
 		']'  '='
+%%%%%%%%%%%
 		@Expression
 		.sExpnEnd
 	    | *:
@@ -400,8 +563,15 @@ CallStmt :
 	.sCallStmt
 	.sIdentifier	% procedure identifier accepted in the Statement rule
 	% accept zero or more actual parameters
+%%%%%%%%%%% CHANGED 
+%	[
+%	    | '(':
+%%%%%%%%%%% 
+	'('
 	[
-	    | '(':
+	    | ')':
+	    | *:
+%%%%%%%%%%% 
 		{
 		    @Expression
 		    .sExpnEnd
@@ -421,110 +591,128 @@ CallStmt :
 		    ]
 		}
 		')'
-	    | *:	% no actual parameters
+%%%%%%%%%%% CHANGED 
+%	   | *:	% no actual parameters
+%       ]
+%%%%%%%%%%% 
 	]
+%%%%%%%%%%% 
 	.sParmEnd;
 
-% Enter a scope block, matching statements until the "end" keyword is
-% matched. Emit an implicit sBegin token, and emit an sEnd upon reaching
-% the "end" keyword. This rule is used in cases where only an "end"
-% keyword provides the valid syntax required to close the scope.
-BlockStatements :
-	.sBegin
-	{[
-	    | 'end':
-	        .sEnd
-	        >
-        |*:
-        @Statement
-	]};
+%%%%%%%%%%% DELETED
+% BeginStmt :
+%	.sBegin
+%	{
+%	    @Statement
+%	    [
+%		| ';':
+%		| 'end':
+%		    .sEnd
+%		    >
+%	    ]
+%	};
+%%%%%%%%%%% 
 
-% Automatically output sBegin due to removal of the explicit "begin" keyword.
-% First handle the three separate cases that will cause the statement block
-% to close, and match a statement otherwise. The three cases are:
-% 1. if the "end" keyword occurs, output sEnd and leave the rule
-% 2. if the "else" keyword occurs, output sEnd and sElse, then call
-%    BlockStatements to output a "sBegin/statements/sEnd" sequence
-% 3. if the "elsif" keyword occurs, output sEnd, sElse, and sBegin,
-%    then call IfStmt to handle the expression as nested if statement
-%    within the else case
+%%%%%%%%%%% CHANGED
+% IfStmt :
+%	.sIfStmt
+%	@Expression 
+%	.sExpnEnd
+%	'then'  .sThen
+%	@Statement
+%	[
+%	    | 'else':
+%		.sElse
+%		@Statement
+%	    | *:
+%	];
+%%%%%%%%%%% 
 IfStmt :
 	.sIfStmt
 	@Expression
 	.sExpnEnd
-	'then' .sThen
-	.sBegin
-	{[
-	    | 'end':
-	    .sEnd
-	    >
-	    | 'else':
-        .sEnd
-        .sElse
-        @BlockStatements
-        >
+	'then'  .sThen
+	@Statements
+	[
 	    | 'elsif':
-	    .sEnd
-	    .sElse
-	    .sBegin
-	    @IfStmt
-	    >
+		.sElse
+		@IfStmt    % no 'end' in this case!
+	    | 'else':
+		.sElse
+		@Statements
+		'end'
 	    | *:
-	    @Statement
-	]};
+		'end'
+	];
+%%%%%%%%%%% 
 
-% Added this rule to handle "unless" statements, which are simple negated
-% if statements. They are output nearly identically to an if statement,
-% with an sNot token included after the expression (which will negate
-% the expression in postfix), and the 'elsif' logic removed.
+%%%%%%%%%%% ADDED 
 UnlessStmt :
-    .sIfStmt
-    @Expression
-    .sNot
-    .sExpnEnd
-    'then' .sThen
-    .sBegin
-    {[
-        | 'else':
-        .sEnd
-        .sElse
-        @BlockStatements
-        >
-        | 'end':
-        .sEnd
-        >
-        |*:
-        @Statement
-    ]};
+	.sIfStmt
+	@Expression 
+	.sNot		% fool semantic phase into thinking it's a normal if
+	.sExpnEnd
+	'then'  .sThen
+	@Statements
+	[
+	    | 'else':
+		.sElse
+		@Statements
+	    | *:
+	]
+	'end';
+%%%%%%%%%%% 
 
-% Parsing of the "of" keyword was removed, as it is no longer used
-% in Garnet's case statement syntax. Calls to the CaseAlternative rule
-% were changed, now entering the rule only upon matching the "when"
-% keyword, and entering the CaseDefault rule upon matching "else".
-% An "end" keyword also allows for the existence of an empty switch,
-% which is valid Garnet syntax.
+%%%%%%%%%%% CHANGED
+% CaseStmt :
+%	.sCaseStmt
+%	@Expression
+%	.sExpnEnd
+%	'of'
+%	{[
+%	     | ';':
+%		 % since case alternatives cannot be null, allow
+%		 % for the common situation of an extra semicolon
+%		 % at the end of the list of case alternatives.
+%		 [
+%		     | 'end':
+%			 >
+%		     | *:
+%			 @CaseAlternative
+%		 ]
+%	    | 'end':
+%		>
+%	    | 'when':
+%		@CaseAlternative
+%	    | *:
+%		>
+%	]}
+%	.sCaseEnd;
+%%%%%%%%%%% 
 CaseStmt :
 	.sCaseStmt
 	@Expression
 	.sExpnEnd
-		[
-		    | 'when':
-            @CaseAlternative
-		    | 'else':
-		    @CaseDefault
-		    | 'end':
-		]
+	{[
+	    | 'when':
+		@CaseAlternative
+	    | *:
+		>
+	]}
+	[
+	    | 'else' :
+		.sElse
+		@Statements
+	    | *:
+	]
+	'end' 
 	.sCaseEnd;
+%%%%%%%%%%% 
 
-% Case alternatives were changed to call the CaseAlternative rule
-% until the "else" keyword is matched, in which case the CaseDefault
-% rule is used in a one-way fashion (that is, zero or more "when"
-% cases can be contained in a switch before an "else" case).
-% The rule now also allows for empty case bodies, containing zero
-% statements, which is also valid Garnet due to the presence of
-% the "end" keyword.
 CaseAlternative :
-	% A case alternative is a statement labelled by the "when" keyword
+	% A case alternative is a statement labelled by
+	% one or more optionally signed integer constants
+
 	{
 	    @OptionallySignedIntegerConstant
 	    [
@@ -533,67 +721,62 @@ CaseAlternative :
 		    >
 	    ]
 	}
-	'then'
 	.sLabelEnd
-	.sBegin
-	{[
-	    | 'when':
-	    .sEnd
-	    @CaseAlternative
-	    >
-	    | 'else':
-	    .sEnd
-	    @CaseDefault
-	    >
-	    | 'end':
-	    .sEnd
-	    >
-	    |*:
-	    @Statement
-	]};
-
-% The default case statement is handled by the BlockStatements
-% rule, repeatedly matching and outputting statement sequences
-% until an "end" keyword is reached.
-CaseDefault :
-    @BlockStatements;
+%%%%%%%%%%% CHANGED
+%       ':'  @Statement;
+%%%%%%%%%%% 
+	'then'
+	@Statements;
+%%%%%%%%%%% 
 
 WhileStmt :
 	.sWhileStmt
 	@Expression
 	.sExpnEnd
 	'do'
-	@BlockStatements;
+%%%%%%%%%%% CHANGED
+%	@Statement;
+%%%%%%%%%%% 
+	@Statements
+	'end';
+%%%%%%%%%%% 
 
-% PT's "repeat" statement was removed and replaced with Garnet's
-% "do" statement. This generalized loop allows for an optional
-% block of statements, followed by a required "break if" statement
-% (which contains an expression representing the break condition),
-% and a second optional block of statements.
+%%%%%%%%%%% CHANGED
+% RepeatStmt :
+%	.sRepeatStmt
+%	{
+%	    @Statement
+%	    [
+%		| ';':
+%		| 'until':
+%		    .sRepeatEnd
+%		    >
+%	    ]
+%	}
+%	.sExpnEnd;
+%%%%%%%%%%% 
 DoStmt :
-	.sDo
-	.sBegin
-	{[
-		| 'break':
-		 'if'
-		 .sEnd
-		 .sBreakIf
-		 @Expression
-		 .sExpnEnd
-		 @BlockStatements
-		 >
-	    |*:
-	    @Statement
-	]}
-	.sExpnEnd;
+	.sDoStmt
+	@Statements
+	'break' 'if' .sBreakIf @Expression .sExpnEnd 
+	@Statements
+	'end'; 
+%%%%%%%%%%% 
 
 Expression :
 	@SimpleExpression
 	[
+%%%%%%%%%%% CHANGED 
+%	    | '=':
+%		@SimpleExpression  .sEq
+%	    | '<>':
+%		@SimpleExpression  .sNE
+%%%%%%%%%%%
 	    | '==':
 		@SimpleExpression  .sEq
 	    | '!=':
 		@SimpleExpression  .sNE
+%%%%%%%%%%%
 	    | '<':
 		@SimpleExpression  .sLT
 	    | '<=':
@@ -626,45 +809,39 @@ SimpleExpression :
 	]};
 
 Term :
-    %Term now calls SubTerm to account for the new precedence level of $
-	@SubTerm
+	@Factor
 	{[
 	    | '*':
-		@SubTerm  
-        .sMultiply
+		@Factor  .sMultiply
 	    | 'div':
-		@SubTerm 
-        .sDivide
+		@Factor  .sDivide
 	    | 'mod':
-		@SubTerm 
-        .sModulus
+		@Factor  .sModulus
 	    | 'and':
-		.sInfixAnd  
-        @SubTerm 
-        .sAnd
-        %Added new index operator at mid-precedence
-        | '?':
-        @SubTerm
-        .sIndex
+		.sInfixAnd  @Factor  .sAnd
+%%%%%%%%%%% ADDED
+	    | '?':
+		@Factor	 .sIndex
+%%%%%%%%%%% 
+
 	    | *:
 		>
 	]};
 
-%New rule to allow for new precedence level of $ operator
-SubTerm :
-    @Factor
-    {[
-        %$ operator can take SimpleExpression operators as its parameters
-        | '$':
-    		@SimpleExpression
-    		'..'
-    		@SimpleExpression
-            .sSubstring
-        | *:
-            >
-    ]};
-
+%%%%%%%%%%% CHANGED
+% Factor :
+%%%%%%%%%%% 
 Factor :
+	@SubFactor
+	{[
+	    | '$':
+		@SubFactor '..' @Subfactor .sSubstring
+	    | *:
+		>
+	]};
+
+SubFactor :
+%%%%%%%%%%% 
 	[
 	    | pIdentifier:
 		.sIdentifier
@@ -674,12 +851,17 @@ Factor :
 	    | '(':
 		@Expression  ')'
 	    | '!':
-		@Factor
+%%%%%%%%%%% CHANGED
+%		@Factor
+%%%%%%%%%%% 
+		@SubFactor
+%%%%%%%%%%% 
 		.sNot
-        %Added new length operator at highest precedence level
-        | '#':
-        @Factor
-        .sLength
+%%%%%%%%%%% ADDED
+	    | '#':
+		@SubFactor
+		.sLength
+%%%%%%%%%%% 
 	    | pLiteral:
 		.sLiteral
 	    | 'file':
@@ -694,11 +876,31 @@ IdentifierExtension :
 		.sSubscript
 		@Expression  ']'
 		.sExpnEnd
+%%%%%%%%%%% CHANGED 858
+%	    | '(':
+%		.sParmBegin
+%		@Expression  ')'
+%		.sExpnEnd
+%		.sParmEnd
+%%%%%%%%%%% 
 	    | '(':
-		.sParmBegin
-		@Expression  ')'
-		.sExpnEnd
-		.sParmEnd
+		[
+		    | ')':
+		    | *:
+			.sParmBegin
+			{
+			    @Expression
+			    .sExpnEnd
+			    [
+				| ',':
+				| *:
+				    >
+			    ]
+			}
+			')'
+			.sParmEnd
+		]
+%%%%%%%%%%% END 858
 	    | *:
 	];
 
