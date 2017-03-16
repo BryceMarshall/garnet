@@ -303,6 +303,12 @@ mechanism SymbolTable :
 	% Return true if any external names (program parameters)
 	% have not yet been declared.
 
+    oSymbolStripScope
+	% Remove all identifier links to non-public symbols in this scope
+
+    oSymbolMergeScope
+	% Merge this lexical level with the previous one
+
 
 
 
