@@ -18,7 +18,6 @@
 Input :
 	sIdentifier 
 	firstInputToken = sIdentifier
-	firstSemanticToken = sIdentifier
 	firstCompoundSemanticToken = sIdentifier
 	sInteger
 	sLiteral
@@ -31,6 +30,7 @@ Input :
 	sType
 	sVar
 	sProcedure
+	sPublic
 	sBegin
 	sEnd
 	sNegate
@@ -51,6 +51,9 @@ Input :
 	sThen
 	sElse
 	sWhileStmt
+	sModule
+	sDoStmt
+	sBreakIf
 	sEq
 	sNE
 	sLT
@@ -66,16 +69,12 @@ Input :
 	sOr
 	sInfixAnd
 	sAnd
-	sNot
+	sNot 
+	sSubstring
+	sLength
+	sIndex
 	sNewLine
-    sPublic
-    sModule
-    sDo
-    sBreakIf
-    sSubstring
-    sLength
-    sIndex
-	lastInputToken = sIndex;
+	lastInputToken = sNewLine;
 
 Output :	% corresponds to coder.ssl input
 	tMultiply 
