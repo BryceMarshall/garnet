@@ -1398,7 +1398,14 @@ ProcedureDefinition :
 	.tSkipProc	% Branch around the procedure definition
 	oFixPushForwardBranch
 	oEmitNullAddress
-	oSymbolStkSetKind(syProcedure)
+	[
+	    | sPublic:
+		% If procedure is public, set its type to public
+		oSymbolStkSetKind(syPublicProcedure)
+	    | * :
+		% Else do regular procedure
+		oSymbolStkSetKind(syProcedure)
+	]
 	oSymbolStkEnterCodeAddress
 	oTypeStkPush(tpNull)
 	oTypeStkSetRecursionFlag(yes)
@@ -1536,7 +1543,10 @@ ProcedurePrologue :
 	oCountPop;
 
 ModuleDeclaration :
-	> % placeholder
+	sIdentifier osymbolStkPushLocalIdentifier % Might have to decide type?
+	@Block
+	oSymbolStripScope
+	oSymbolMergeScope
 
 Statement :
 	[
