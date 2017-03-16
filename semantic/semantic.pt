@@ -1770,7 +1770,7 @@ program SemanticAnalysis (output, semanticSsl, parseStream, temp, tCode, options
 					end
 				end
 			end;
-'
+
 		    oSymbolTblStripScope:
 			begin
 			    Assert((lexicLevelStackTop >= 1), assert31);

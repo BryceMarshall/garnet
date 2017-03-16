@@ -299,14 +299,14 @@ mechanism SymbolTable :
 	% the scope being exited, except for formal parameters
 	% which must be retained for type checking.
 
-    oSymbolTblLookupExternal >> Boolean;
+    oSymbolTblLookupExternal >> Boolean
 	% Return true if any external names (program parameters)
 	% have not yet been declared.
 
     oSymbolStripScope
 	% Remove all identifier links to non-public symbols in this scope
 
-    oSymbolMergeScope
+    oSymbolMergeScope;
 	% Merge this lexical level with the previous one
 
 
@@ -1391,24 +1391,37 @@ AllocateVar :
 	];
 
 ProcedureDefinition :
-	sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
-	[ oSymbolStkChooseKind
-	    | syUndefined:
-	    | syExternal:
-		% Program parameters must be declared as file variables
-		#eExternalDeclare
-	    | *:
-		#eMultiplyDefined
-		% New definition obscures old one.
-	]
-	.tSkipProc	% Branch around the procedure definition
-	oFixPushForwardBranch
-	oEmitNullAddress
 	[
 	    | sPublic:
+		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
+		[ oSymbolStkChooseKind
+		    | syUndefined:
+		    | syExternal:
+			% Program parameters must be declared as file variables
+			#eExternalDeclare
+		    | *:
+			#eMultiplyDefined
+			% New definition obscures old one.
+		]
+		.tSkipProc	% Branch around the procedure definition
+		oFixPushForwardBranch
+		oEmitNullAddress
 		% If procedure is public, set its type to public
 		oSymbolStkSetKind(syPublicProcedure)
 	    | * :
+		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
+		[ oSymbolStkChooseKind
+		    | syUndefined:
+		    | syExternal:
+			% Program parameters must be declared as file variables
+			#eExternalDeclare
+		    | *:
+			#eMultiplyDefined
+			% New definition obscures old one.
+		]
+		.tSkipProc	% Branch around the procedure definition
+		oFixPushForwardBranch
+		oEmitNullAddress
 		% Else do regular procedure
 		oSymbolStkSetKind(syProcedure)
 	]
