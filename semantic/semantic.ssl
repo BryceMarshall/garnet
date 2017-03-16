@@ -141,6 +141,7 @@ Output :	% corresponds to coder.ssl input
 	tLength
 	tIndex
 	tStringEqual
+    tCaseElse
 
 	% Compound T-codes are those that take operands
 	tLiteralAddress
