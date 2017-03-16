@@ -1229,14 +1229,20 @@ SubrangeUpperBound :
 	];
 
 VariableDeclarations :
+	sIdentifier
+	@VariablePushStack
+	oCountPush(one)
 	{[
-	    | sIdentifier:
-		@VariableAttributes
-	    | *:
-		>
+	  | sVar :
+		sIdentifier
+		@VariablePushStack
+		oCountIncrement
+	  | * :
+		%We have reached the type declaration
+				
 	]};
 
-VariableAttributes :
+VariablePushStack :
 	oSymbolStkPushLocalIdentifier
 	[ oSymbolStkChooseKind
 	    | syUndefined, syExternal:
@@ -1244,6 +1250,8 @@ VariableAttributes :
 		#eMultiplyDefined
 		% The new definition will obscure the old one
 	]
+
+VariableAttributes :
 	% Push the variable's structure and
 	% component types onto the type stack
 	@TypeBody
