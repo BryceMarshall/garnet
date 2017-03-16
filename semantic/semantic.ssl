@@ -1794,11 +1794,14 @@ WhileStmt :
 	oFixPopForwardBranch;
 
 DoStmt :
+    %Removed RepeatStmt, changed DoStmt to operate like while stmt
 	.tDoBegin
 	oFixPushTargetAddress		% top-of-loop branch target
+    %Allow statement sequence before break if
     @Statement
     .tDoBreakIf
 	@BooleanControlExpression
+    %T-codes are different from previous
 	.tDoTest
 	oFixPushForwardBranch
 	oEmitNullAddress		% exit branch
@@ -1825,6 +1828,7 @@ CaseStmt :
 	.tCaseEnd
 	oFixPopForwardBranch
 	oEmitCaseBranchTable
+    %in case of optional else statement after tCaseEnd, run ElseCase
     [
         | sElse:
         .tCaseElse
@@ -1903,6 +1907,7 @@ CaseAlternative :
 	oCountIncrement;
 
 ElseCase:
+    %ElseCase allows a statement, no case select.  
 	@Statement
 	.tCaseMerge
 	oFixPushForwardBranch
