@@ -2009,9 +2009,18 @@ BinaryOperator :
 	% but that would probably be less efficient on average.
 	[
 	    | sAdd:
-		.tAdd
-		oTypeStkPush(tpInteger)	% result type
-		@CompareOperandAndResultTypes
+	    [ oTypeStkChooseKind
+            | tpInteger:
+            .tAdd
+            oTypeStkPush(tpInteger)	% result type
+            @CompareOperandAndResultTypes
+            | tpString:
+            .tConcatenate
+            oTypeStkPush(tpString) % result type
+            @CompareOperandAndResultTypes
+            | *:
+            #eTypeMismatch
+	    ]
 	    | sSubtract:
 		.tSubtract
 		oTypeStkPush(tpInteger)
