@@ -2065,7 +2065,6 @@ Operand :
 		oEmitValue
 		oValuePop
 	    | sLiteral:
-		oValuePush(one)	% implicit lower bound of string index type
 		oValuePushStringLength
 		[ oValueChoose
 		    | zero:
@@ -2084,10 +2083,8 @@ Operand :
 			oEmitValue	% string length
 			oEmitString
 			oTypeStkPush(tpString)
-			oTypeStkEnterBounds
 			oTypeStkLinkToStandardComponentType(stdString)
 		]
-		oValuePop
 		oValuePop
 	    | sFile:
 		@Expression
