@@ -2132,6 +2132,7 @@ TernaryOperator :
 	    @SwapAndCheckStringAndPop   % first operand must be a string
 	    % only result type remains
         oSymbolStkPop
+        oSymbolStkPop
         oSymbolStkSetKind(syExpression)
 	    | *:
 	];
