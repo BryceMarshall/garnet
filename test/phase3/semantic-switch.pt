@@ -1,0 +1,58 @@
+using progName
+var a : integer
+a = 2
+
+case a
+end
+
+case a
+    when 2 then
+end
+
+case a
+    when 2 then
+        a = 3
+        a = 3
+end
+
+case a
+    else
+end
+
+case a
+    else
+        a = 3
+        a = 3
+end
+
+case a
+    when 2 then
+    when 3 then
+end
+
+case a
+    when 2 then
+        a = 3
+        a = 3
+    when 3 then
+        a = 4
+        a = 4
+end
+
+case a
+    when 2 then
+    when 3 then
+    else
+end
+
+case a
+    when 2 then
+        a = 3
+        a = 3
+    when 3 then
+        a = 4
+        a = 4
+    else
+        a = 5
+        a = 5
+end
