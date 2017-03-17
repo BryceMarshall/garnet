@@ -2079,22 +2079,11 @@ Operand :
 			oEmitString
 		    | *:
 			oSymbolStkPush(syExpression)
-			% branch around string since
-			% it is stored in the code area
-			.tSkipString
-			oFixPushForwardBranch
-			oEmitNullAddress
+            % Emit literal string length followed by value
 			.tLiteralString
 			oEmitValue	% string length
-			oFixPushTargetAddress
-			oFixSwap		% Forward branch back on top
 			oEmitString
-			oFixPopForwardBranch
-			% Descriptor points to the
-			% first character of the string
-			.tStringDescriptor
-			oFixPopTargetAddress
-			oTypeStkPush(tpPackedArray)
+			oTypeStkPush(tpString)
 			oTypeStkEnterBounds
 			oTypeStkLinkToStandardComponentType(stdString)
 		]
