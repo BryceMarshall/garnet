@@ -2032,6 +2032,13 @@ UnaryOperator :
 	    | sNot:
 		.tNot
 		oTypeStkPush(tpBoolean)
+		| sLength:
+		.tLength
+		oTypeStkPush(tpInteger)	% result type
+		oSymbolStkSetKind(syExpression)
+		@SwapAndCheckStringAndPop   % operand must be a string
+		oTypeStkPop;
+		>>		% bypass generalized type check
 	    | *:
 		>>		% bypass type check
 	]
@@ -2107,20 +2114,9 @@ BinaryOperator :
 		| sIndex:
 		.tIndex
 		oTypeStkPush(tpInteger) % result type
-		oTypeStkSwap
-		[ oTypeStkChooseKind    % second operand must be a string
-		    | tpString:
-		    | *:
-		    #eTypeMismatch
-		]
-		oTypeStkPop
-		oTypeStkSwap
-        [ oTypeStkChooseKind    % first operand must be a string
-            | tpString:
-            | *:
-            #eTypeMismatch
-        ]
-        oTypeStkPop             % only result type remains
+		@SwapAndCheckStringAndPop   % second operand must be a string
+		@SwapAndCheckStringAndPop   % first operand must be a string
+		% only result type remains
         oSymbolStkPop
         oSymbolStkSetKind(syExpression)
 	    | *:
@@ -2130,32 +2126,35 @@ TernaryOperator :
 	[
 	    | sSubstring:
 	    .tSubstring
-	    oTypeStkPush(tpString)  % result type
-	    oTypeStkSwap
-	    [ oTypeStkChooseKind    % third operand must be an integer
-	        | tpInteger:
-	        | *:
-	        #eTypeMismatch
-	    ]
-	    oTypeStkPop
-	    oTypeStkSwap
-        [ oTypeStkChooseKind    % second operand must be an integer
-            | tpInteger:
-            | *:
-            #eTypeMismatch
-        ]
-        oTypeStkPop
-        oTypeStkSwap
-        [ oTypeStkChooseKind    % first operand must be a string
-            | tpString:
-            | *:
-            #eTypeMismatch
-        ]
-        oTypeStkPop             % only result type remains
+	    oTypeStkPush(tpString)      % result type
+	    @SwapAndCheckIntegerAndPop  % third operand must be an integer
+	    @SwapAndCheckIntegerAndPop  % second operand must be an integer
+	    @SwapAndCheckStringAndPop   % first operand must be a string
+	    % only result type remains
         oSymbolStkPop
         oSymbolStkSetKind(syExpression)
 	    | *:
 	];
+
+SwapAndCheckIntegerAndPop :
+    oTypeStkSwap
+    [ oTypeStkChooseKind
+        | tpInteger:
+        | *:
+        #eTypeMismatch
+    ]
+    oTypeStkPop
+;
+
+SwapAndCheckStringAndPop :
+    oTypeStkSwap
+    [ oTypeStkChooseKind    % first operand must be a string
+        | tpString:
+        | *:
+        #eTypeMismatch
+    ]
+    oTypeStkPop
+;
 
 CompareAndSwapTypes :
 	% Compare the top two type stack entries for assignment
