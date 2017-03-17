@@ -2178,11 +2178,22 @@ BinaryOperator :
 		oTypeStkPush(tpBoolean)
 		@CompareOperandAndResultTypes
 	    | sEq:
-		.tEq
-		@CompareRelationalOperandTypes
+		[ oTypeStkChooseKind
+		    | tpString:
+		    @CheckStringEquality
+		    | *:
+		    .tEq
+		    @CompareRelationalOperandTypes
+		]
 	    | sNE:
-		.tNE
-		@CompareRelationalOperandTypes
+	    [ oTypeStkChooseKind
+            | tpString:
+            @CheckStringEquality
+            .tNot
+            | *:
+            .tNE
+            @CompareRelationalOperandTypes
+        ]
 	    | sGT:
 		.tGT
 		@CompareRelationalOperandTypes
@@ -2316,6 +2327,19 @@ CompareOperandAndResultTypes :
 	oSymbolStkPop
 	oSymbolStkSetKind(syExpression);
 
+CheckStringEquality :
+    .tStringEqual
+    oTypeStkPop
+    [ oTypeStkChooseKind
+        | tpString:
+        | *:
+        #eOperandOperatorTypeMismatch
+    ]
+    oTypeStkPop
+    oTypeStkPush(tpBoolean)
+    oSymbolStkPop
+    oSymbolStkSetKind(syExpression);
+
 CompareRelationalOperandTypes :
 	% Verify that the types of the two operands are assignment
 	% compatible and that they are valid relational expression
@@ -2328,13 +2352,6 @@ CompareRelationalOperandTypes :
 		oTypeStkPop
 		[ oTypeStkChooseKind
 		    | tpInteger, tpSubrange:
-		    | *:
-			#eOperandOperatorTypeMismatch
-		]
-	    | tpString:
-		oTypeStkPop
-		[ oTypeStkChooseKind
-		    | tpString:
 		    | *:
 			#eOperandOperatorTypeMismatch
 		]
