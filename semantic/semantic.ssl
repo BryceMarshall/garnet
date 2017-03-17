@@ -2670,36 +2670,11 @@ AssignProcedure :
 		    | *:
 			@Expression
 			[ oTypeStkChooseKind
-			    | tpArray:
-				.tSubscriptBegin
-				.tLiteralInteger
-				oValuePush(one)
-				oEmitValue
-				oValuePop
-				.tSubscriptString
-				.tVarParm
-			    | *:
-			]
-			[ oTypeStkChooseKind
-			    | tpString:
-				oValuePushTypeStkLowerBound
-				[ oValueChoose
-				    | one:
-				    | *:	% string has lower bound one
-					#eFileNameReqd
-				]
-				oValuePop
-				.tParmEnd
-				% need length of string as well
-				.tLiteralInteger
-				oValuePushTypeStkUpperBound
-				[ oTypeStkChooseKind
-				    | tpPackedArray:	% a literal string	
-					oValueNegate	% mark as code segment	
-				    | tpArray:
-				]
-				oEmitValue
-				oValuePop
+			    | tpString:                 % must be a string
+			    .tLiteralString
+			    oValuePushStringLength
+			    oEmitValue
+			    oValuePop
 				.tParmEnd
 				sParmEnd
 			    | *:
@@ -2753,17 +2728,6 @@ WriteProcedure :
 					    .tVarParm
 					    .tParmEnd
 					    @Expression
-					    [ oTypeStkChooseKind
-						| tpArray:
-						    .tSubscriptBegin
-						    .tLiteralInteger
-						    oValuePush(one)
-						    oEmitValue
-						    oValuePop
-						    .tSubscriptString
-						    .tVarParm
-						| *:
-					    ]
 					    .tParmEnd
 					    @WriteString
 					    [
@@ -2927,11 +2891,8 @@ WriteString :
 		[ oTypeStkChooseKind	% of expression being written
 		    | tpInteger, tpSubrange:
 			oValuePush(ten)
-		    | tpString:
-			oValuePush(one)
-		    | tpPackedArray:	% a literal string
-			oValuePushTypeStkUpperBound
-			oValueNegate	% mark as code segment
+		    | tpString:         % a literal string
+			oValuePushStringLength
 		    | *:	% An error flagged below
 			oValuePush(zero)
 		]
