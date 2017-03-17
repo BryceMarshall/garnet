@@ -925,6 +925,7 @@ ConstantValue :		% An identifier token has just been accepted
 		oSymbolStkEnterValue
 		oValuePop
 	    | sLiteral:
+        oSymbolStkSetKind(syVariable)
 		oValuePush(one)	% implicit lower bound of string index type
 		oValuePushStringLength
 		[ oValueChoose
@@ -1238,6 +1239,7 @@ VariableDeclarations :
 		@VariablePushStack
 		oCountIncrement
 	  | * :
+        @VariableAttributes
 		%We have reached the type declaration
 				
 	]};
@@ -1255,87 +1257,181 @@ VariableAttributes :
 	% Push the variable's structure and
 	% component types onto the type stack
 	@TypeBody
-	[ oSymbolStkChooseKind
-	    | syExternal:	% file parameter to program
-		oTypeStkSwap	% structure on top
-		[ oTypeStkChooseKind
-		    | tpFile:
-			oSymbolStkSetKind(syVariable)
-			oTypeStkSwap	% component on top
-			[ oTypeStkChooseTypeReference
-			    | no:	% no type table entry
-				oTypeTblEnter
-			    | *:
-			]
-			oTypeStkEnterComponentReference
-			oTypeStkSwap	% structure on top
-			[ oTypeStkChooseTypeReference
-			    | no:
-				oTypeTblEnter
-			    | *:
-			]
-			oSymbolStkEnterTypeReference
-			% A symbol table entry was created for the file
-			% when its program parameter was accepted.
-			oSymbolTblUpdate
-		    | *:
-			#eExternalDeclare	% Ignore this declaration
-		]
-	    | *:		% new variable or redeclaration in this scope
-		oSymbolStkSetKind(syVariable)
-		oTypeStkSwap	% structure on top
-		[ oTypeStkChooseKind
-		    | tpFile:
-			% an internal file
-			oSymbolStkSetKind(syVariable)
-			oTypeStkSwap	% component on top
-			[ oTypeStkChooseTypeReference
-			    | no:	% no type table entry
-				oTypeTblEnter
-			    | *:
-			]
-			oTypeStkEnterComponentReference
-			oTypeStkSwap	% structure on top
-			[ oTypeStkChooseTypeReference
-			    | no:
-				oTypeTblEnter
-			    | *:
-			]
-			oSymbolStkEnterTypeReference
-			oValuePush(zero)
-			@AllocateVar
-			oValuePop
-		    | *:
-			@AllocateVar
-		]
 
-		% Create type table entries for the object as necessary.
-		% Where named types were used in the declaration, a type
-		% reference will be present, otherwise the type reference
-		% fields will be null.
-		[ oTypeStkChooseKind
-		    | tpArray, tpFile:
-			oTypeStkSwap	% component on top
-			[ oTypeStkChooseTypeReference
-			    | no:	% no type table entry
-				oTypeTblEnter
-			    | *:
-			]
-			oTypeStkEnterComponentReference
-			oTypeStkSwap	% structure on top
-		    | *:
-		]
-		[ oTypeStkChooseTypeReference
-		    | no:
-			oTypeTblEnter
-		    | *:
-		]
-		oSymbolStkEnterTypeReference
-		oSymbolTblEnter
-	]
-	oSymbolStkPop
+    {[ oCountChoose
+        | zero :
+            >
+        | ? :
+            oCountDecrement
+            [ oSymbolStkChooseKind
+                | syExternal:	% file parameter to program
+                oTypeStkSwap	% structure on top
+                [ oTypeStkChooseKind
+                    | tpFile:
+                    oSymbolStkSetKind(syVariable)
+                    oTypeStkSwap	% component on top
+                    [ oTypeStkChooseTypeReference
+                        | no:	% no type table entry
+                        oTypeTblEnter
+                        | *:
+                    ]
+                    oTypeStkEnterComponentReference
+                    oTypeStkSwap	% structure on top
+                    [ oTypeStkChooseTypeReference
+                        | no:
+                        oTypeTblEnter
+                        | *:
+                    ]
+                    oSymbolStkEnterTypeReference
+                    % A symbol table entry was created for the file
+                    % when its program parameter was accepted.
+                    oSymbolTblUpdate
+                    | *:
+                    #eExternalDeclare	% Ignore this declaration
+                ]
+                | *:		% new variable or redeclaration in this scope
+                oSymbolStkSetKind(syVariable)
+                oTypeStkSwap	% structure on top
+                [ oTypeStkChooseKind
+                    | tpFile:
+                    % an internal file
+                    oSymbolStkSetKind(syVariable)
+                    oTypeStkSwap	% component on top
+                    [ oTypeStkChooseTypeReference
+                        | no:	% no type table entry
+                        oTypeTblEnter
+                        | *:
+                    ]
+                    oTypeStkEnterComponentReference
+                    oTypeStkSwap	% structure on top
+                    [ oTypeStkChooseTypeReference
+                        | no:
+                        oTypeTblEnter
+                        | *:
+                    ]
+                    oSymbolStkEnterTypeReference
+                    oValuePush(zero)
+                    @AllocateVar
+                    oValuePop
+                    | *:
+                    @AllocateVar
+                ]
+
+                % Create type table entries for the object as necessary.
+                % Where named types were used in the declaration, a type
+                % reference will be present, otherwise the type reference
+                % fields will be null.
+                [ oTypeStkChooseKind
+                    | tpArray, tpFile:
+                    oTypeStkSwap	% component on top
+                    [ oTypeStkChooseTypeReference
+                        | no:	% no type table entry
+                        oTypeTblEnter
+                        | *:
+                    ]
+                    oTypeStkEnterComponentReference
+                    oTypeStkSwap	% structure on top
+                    | *:
+                ]
+                [ oTypeStkChooseTypeReference
+                    | no:
+                    oTypeTblEnter
+                    | *:
+                ]
+                oSymbolStkEnterTypeReference
+                oSymbolTblEnter
+            ]
+            oTypeStkSwap
+            oSymbolStkPop
+    ]}
 	oTypeStkPop
 	oTypeStkPop;
+
+%VariableAttributes :
+%	% Push the variable's structure and
+%	% component types onto the type stack
+%	@TypeBody
+%	[ oSymbolStkChooseKind
+%	    | syExternal:	% file parameter to program
+%		oTypeStkSwap	% structure on top
+%		[ oTypeStkChooseKind
+%		    | tpFile:
+%			oSymbolStkSetKind(syVariable)
+%			oTypeStkSwap	% component on top
+%			[ oTypeStkChooseTypeReference
+%			    | no:	% no type table entry
+%				oTypeTblEnter
+%			    | *:
+%			]
+%			oTypeStkEnterComponentReference
+%			oTypeStkSwap	% structure on top
+%			[ oTypeStkChooseTypeReference
+%			    | no:
+%				oTypeTblEnter
+%			    | *:
+%			]
+%			oSymbolStkEnterTypeReference
+%			% A symbol table entry was created for the file
+%			% when its program parameter was accepted.
+%			oSymbolTblUpdate
+%		    | *:
+%			#eExternalDeclare	% Ignore this declaration
+%		]
+%	    | *:		% new variable or redeclaration in this scope
+%		oSymbolStkSetKind(syVariable)
+%		oTypeStkSwap	% structure on top
+%		[ oTypeStkChooseKind
+%		    | tpFile:
+%			% an internal file
+%			oSymbolStkSetKind(syVariable)
+%			oTypeStkSwap	% component on top
+%			[ oTypeStkChooseTypeReference
+%			    | no:	% no type table entry
+%				oTypeTblEnter
+%			    | *:
+%			]
+%			oTypeStkEnterComponentReference
+%			oTypeStkSwap	% structure on top
+%			[ oTypeStkChooseTypeReference
+%			    | no:
+%				oTypeTblEnter
+%			    | *:
+%			]
+%			oSymbolStkEnterTypeReference
+%			oValuePush(zero)
+%			@AllocateVar
+%			oValuePop
+%		    | *:
+%			@AllocateVar
+%		]
+%
+%		% Create type table entries for the object as necessary.
+%		% Where named types were used in the declaration, a type
+%		% reference will be present, otherwise the type reference
+%		% fields will be null.
+%		[ oTypeStkChooseKind
+%		    | tpArray, tpFile:
+%			oTypeStkSwap	% component on top
+%			[ oTypeStkChooseTypeReference
+%			    | no:	% no type table entry
+%				oTypeTblEnter
+%			    | *:
+%			]
+%			oTypeStkEnterComponentReference
+%			oTypeStkSwap	% structure on top
+%		    | *:
+%		]
+%		[ oTypeStkChooseTypeReference
+%		    | no:
+%			oTypeTblEnter
+%		    | *:
+%		]
+%		oSymbolStkEnterTypeReference
+%		oSymbolTblEnter
+%	]
+%	oSymbolStkPop
+%	oTypeStkPop
+%	oTypeStkPop;
 
 AllocateVar :
 	% A symbol stack entry and type stack entries for both
