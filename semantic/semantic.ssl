@@ -305,10 +305,10 @@ mechanism SymbolTable :
 	% Return true if any external names (program parameters)
 	% have not yet been declared.
 
-    oSymbolStripScope
+    oSymbolTblStripScope
 	% Remove all identifier links to non-public symbols in this scope
 
-    oSymbolMergeScope;
+    oSymbolTblMergeScope;
 	% Merge this lexical level with the previous one
 
 
@@ -1653,8 +1653,8 @@ ProcedurePrologue :
 ModuleDeclarations :
 	sIdentifier osymbolStkPushLocalIdentifier % Might have to decide type?
 	@Block
-	oSymbolStripScope
-	oSymbolMergeScope;
+	oSymbolTblStripScope
+	oSymbolTblMergeScope;
 
 Statement :
 	[
