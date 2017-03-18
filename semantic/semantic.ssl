@@ -75,7 +75,8 @@ Input :
 	sLength
 	sIndex
 	sNewLine
-	lastInputToken = sNewLine;
+	sEndOfFile
+	lastInputToken = sEndOfFile;
 
 Output :	% corresponds to coder.ssl input
 	tMultiply 

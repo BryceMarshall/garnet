@@ -1,0 +1,4 @@
+using progName1, progName2
+var a : integer
+;
+a = 2
