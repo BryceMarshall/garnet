@@ -142,6 +142,7 @@ Output :	% corresponds to coder.ssl input
 	tIndex
 	tStringEqual
     tCaseElse
+	tDoEnd
 
 	% Compound T-codes are those that take operands
 	tLiteralAddress
@@ -864,7 +865,7 @@ Block :
 
 ConstantDefinitions :		% Process a single named constant definition
 	sIdentifier
-	@ConstantValue
+	@ConstantValue;
 
 
 ConstantValue :		% An identifier token has just been accepted
@@ -996,7 +997,7 @@ TypeDefinitions :	% process a single named type definition
 	oSymbolTblEnter
 	oSymbolStkPop
 	oTypeStkPop
-	oTypeStkPop
+	oTypeStkPop;
 
 TypeBody :
 	% Push a type stack entry for the structure type (e.g. array)
@@ -1237,7 +1238,7 @@ VariablePushStack :
 	    | *:
 		#eMultiplyDefined
 		% The new definition will obscure the old one
-	]
+	];
 
 VariableAttributes :
 	% Push the variable's structure and
@@ -1247,7 +1248,8 @@ VariableAttributes :
     {[ oCountChoose
         | zero :
             >
-        | ? :
+        | * :
+	    ?
             oCountDecrement
             [ oSymbolStkChooseKind
                 | syExternal:	% file parameter to program
@@ -1647,7 +1649,7 @@ ProcedurePrologue :
 	oTypeStkEnterParameterCount	% In procedure's type entry
 	oCountPop;
 
-ModuleDeclaration :
+ModuleDeclarations :
 	sIdentifier osymbolStkPushLocalIdentifier % Might have to decide type?
 	@Block
 	oSymbolStripScope
@@ -1667,7 +1669,7 @@ Statement :
 		@WhileStmt
 	    | sCaseStmt:
 		@CaseStmt
-	    | sDo:
+	    | sDoStmt:
 		@DoStmt
 	    | sNullStmt:
 	];
@@ -2105,7 +2107,7 @@ UnaryOperator :
 		oTypeStkPush(tpInteger)	% result type
 		oSymbolStkSetKind(syExpression)
 		@SwapAndCheckStringAndPop   % operand must be a string
-		oTypeStkPop;
+		oTypeStkPop
 		>>		% bypass generalized type check
 	    | *:
 		>>		% bypass type check
