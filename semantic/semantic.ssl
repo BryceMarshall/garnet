@@ -1824,6 +1824,7 @@ DoStmt :
 	oFixPushTargetAddress		% top-of-loop branch target
     %Allow statement sequence before break if
     @Statement
+    sBreakIf
     .tDoBreakIf
 	@BooleanControlExpression
     %T-codes are different from previous
