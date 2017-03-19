@@ -2659,12 +2659,13 @@ AssignProcedure :
 			@Expression
 			[ oTypeStkChooseKind
 			    | tpString:                 % must be a string
-			    .tLiteralString
 			    oValuePushStringLength
-			    oEmitValue
+			    .tLiteralString
+                oEmitValue      % string length
+                oEmitString     % string value
 			    oValuePop
-				.tParmEnd
 				sParmEnd
+				.tParmEnd
 			    | *:
 				#eFileNameReqd
 				@FlushActuals
