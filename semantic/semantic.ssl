@@ -1846,11 +1846,12 @@ CaseStmt :
 	oFixPushForwardBranch
 	oEmitNullAddress		% address of case branch table
 	{[
-	    | sCaseEnd:
-		>
-	    | *:
+	   | sInteger:
 		@CaseAlternative
+        | *:
+            >
 	]}
+    sCaseEnd
 	.tCaseEnd
 	oFixPopForwardBranch
 	oEmitCaseBranchTable
