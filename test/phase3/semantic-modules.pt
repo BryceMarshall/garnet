@@ -1,8 +1,5 @@
 using progName
 module M
-    var a: integer
-    a = 2
+    %var a: integer
+    %a = 2
 end
-var b : integer
-b = 2
-

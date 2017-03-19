@@ -9,11 +9,11 @@ end
 a = 2
 
 while a < 3 do
-    a += 1
+    a = a+1
 end
 
 a = 2
 
 while a < 5 do
-    a += 1
+    a = a+1
 end

@@ -3,14 +3,17 @@ def P()
     var a: integer
     a = 2
 end
-def * Q(var a: integer)
+def Q(a: integer)
    var b: integer
    b = a + 2
 end
-def Q(var a: integer, var b: integer)
-   var b: integer
+def R(var a: integer, var b: integer)
+   var c: integer
    b = a + 2
 end
 
 var b: integer
 b = 2
+P()
+Q(b)
+R(b,b)

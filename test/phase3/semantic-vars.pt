@@ -1,4 +1,5 @@
 using progName
-var a,b,c : integer
-var b : boolean
-var a : string
+var a : integer
+var b,c : integer
+var d : string
+var f : 1..10
