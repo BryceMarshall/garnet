@@ -1846,12 +1846,11 @@ CaseStmt :
 	oFixPushForwardBranch
 	oEmitNullAddress		% address of case branch table
 	{[
-	   | sInteger:
+	    | sInteger:
 		@CaseAlternative
         | *:
             >
 	]}
-    sCaseEnd
 	.tCaseEnd
 	oFixPopForwardBranch
 	oEmitCaseBranchTable
@@ -1939,6 +1938,7 @@ ElseCase:
     %ElseCase allows a statement, no case select.  
 	@Statement
 	.tCaseMerge
+    sCaseEnd
 	oFixPushForwardBranch
 	oEmitNullAddress		% merge branch at end of statement
 	oFixSwap			% keep case select branch on top
