@@ -1402,9 +1402,9 @@ AllocateVar :
 	];
 
 ProcedureDefinition :
+		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
 	[
 	    | sPublic:
-		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
 		[ oSymbolStkChooseKind
 		    | syUndefined:
 		    | syExternal:
@@ -1420,7 +1420,6 @@ ProcedureDefinition :
 		% If procedure is public, set its type to public
 		oSymbolStkSetKind(syPublicProcedure)
 	    | * :
-		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
 		[ oSymbolStkChooseKind
 		    | syUndefined:
 		    | syExternal:
@@ -1573,7 +1572,9 @@ ProcedurePrologue :
 	oCountPop;
 
 ModuleDeclarations :
-	sIdentifier oSymbolStkPushLocalIdentifier % Might have to decide type?
+	sIdentifier oSymbolStkPushIdentifier % Might have to decide type?
+	oSymbolTblEnter
+	oSymbolStkPop
 	oSymbolTblPushScope
 	@Block
 	oSymbolTblStripScope
@@ -1648,7 +1649,7 @@ CallStmt :
 	    | *:
 	]
 	[ oSymbolStkChooseKind
-	    | syProcedure:
+	    | syProcedure,syPublicProcedure:
 		[ oSymbolStkChooseStandardRoutine
 		    | rtReset:
 			.tTrapBegin
