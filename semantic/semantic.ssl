@@ -1573,8 +1573,8 @@ ProcedurePrologue :
 	oCountPop;
 
 ModuleDeclarations :
-	sIdentifier osymbolStkPushLocalIdentifier % Might have to decide type?
-    oSymbolTblPushScope
+	sIdentifier oSymbolStkPushLocalIdentifier % Might have to decide type?
+	oSymbolTblPushScope
 	@Block
 	oSymbolTblStripScope
 	oSymbolTblMergeScope;
