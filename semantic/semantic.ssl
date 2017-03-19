@@ -1253,7 +1253,6 @@ VariableAttributes :
 
     {[ oCountChoose
         | zero :
-            oCountStackPop
             >
         | * :
             oCountDecrement
@@ -1338,6 +1337,7 @@ VariableAttributes :
             oTypeStkSwap
             oSymbolStkPop
     ]}
+        oCountPop
 	oTypeStkPop
 	oTypeStkPop;
 
