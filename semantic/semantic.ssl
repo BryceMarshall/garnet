@@ -1861,6 +1861,7 @@ CaseStmt :
         @ElseCase
         | *:
     ]
+    sCaseEnd
 	% emit merge branches for case alternatives
 	{[ oCountChoose		% number of case alternatives
 	    | zero:
@@ -1936,7 +1937,6 @@ ElseCase:
     %ElseCase allows a statement, no case select.  
 	@Statement
 	.tCaseMerge
-    sCaseEnd
 	oFixPushForwardBranch
 	oEmitNullAddress		% merge branch at end of statement
 	oFixSwap			% keep case select branch on top
