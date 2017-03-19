@@ -932,10 +932,13 @@ ConstantValue :		% An identifier token has just been accepted
 		    | zero:
 			#eNullString
 			@SymbolStkPushStringConstant
-		    | one:
-			oSymbolStkLinkToStandardType(stdString)
-			oSymbolStkEnterStringValue
+		    %   | one:
+			%   oSymbolStkLinkToStandardType(stdString)
+			%   oSymbolStkEnterStringValue
 		    | *:
+            .tAssignBegin
+            .tLiteralAddress
+            oEmitDataAddress
 			.tLiteralString
 			oEmitValue	% string length
 			oEmitString
