@@ -2032,7 +2032,6 @@ UnaryOperator :
 		oTypeStkPush(tpInteger)	% result type
 		oSymbolStkSetKind(syExpression)
 		@SwapAndCheckStringAndPop   % operand must be a string
-		oTypeStkPop
 		>>		% bypass generalized type check
 	    | *:
 		>>		% bypass type check
