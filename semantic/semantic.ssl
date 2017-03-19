@@ -1253,6 +1253,7 @@ VariableAttributes :
 
     {[ oCountChoose
         | zero :
+            oCountStackPop
             >
         | * :
             oCountDecrement
@@ -1339,6 +1340,7 @@ VariableAttributes :
     ]}
 	oTypeStkPop
 	oTypeStkPop;
+
 
 %VariableAttributes :
 %	% Push the variable's structure and
