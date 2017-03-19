@@ -1810,9 +1810,9 @@ program SemanticAnalysis (output, semanticSsl, parseStream, temp, tCode, options
 
 		    oSymbolTblMergeScope:
 			begin	
+                symbolTblDisplay[lexicLevelStackTop-1] = symbolTblTop;
                 lexicLevelStackTop := lexicLevelStackTop - 1;
-                symbolTblDisplay[lexicLevelStackTop] := symbolTblTop;
-                typeTblDisplay[lexicLevelStackTop] := typeTblDisplay[lexicLevelStackTop+1];
+                {typeTblDisplay[lexicLevelStackTop] := typeTblDisplay[lexicLevelStackTop+1];}
 		    end;
 
 
