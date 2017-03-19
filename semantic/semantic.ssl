@@ -938,7 +938,9 @@ ConstantValue :		% An identifier token has just been accepted
 		    | *:
             .tAssignBegin
             .tLiteralAddress
-            oEmitDataAddress
+            oValuePushSymbol
+            oEmitValue
+            oValuePop
 			.tLiteralString
 			oEmitValue	% string length
 			oEmitString
