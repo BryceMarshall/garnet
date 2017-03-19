@@ -2318,9 +2318,9 @@ CheckStringEquality :
 CompareRelationalOperandTypes :
 	% Verify that the types of the two operands are assignment
 	% compatible and that they are valid relational expression
-	% operand types (char, integer or subrange).  Pop the
-	% operand symbol and type stack entries and push result
-	% symbol and type stack entries.
+	% operand types (integer or subrange -- this no longer includes
+	% chars/strings).  Pop the operand symbol and type stack
+	% entries and push result symbol and type stack entries.
 
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange:
