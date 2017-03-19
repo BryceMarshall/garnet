@@ -1938,8 +1938,7 @@ ElseCase:
 	@Statement
 	.tCaseMerge
 	oFixPushForwardBranch
-	oEmitNullAddress		% merge branch at end of statement
-	oFixSwap			% keep case select branch on top
+	oEmitNullAddress		% merge branch at end of statements
 	oCountIncrement;
 
 Expression :
