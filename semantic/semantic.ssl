@@ -55,6 +55,7 @@ Input :
 	sModule
 	sDoStmt
 	sBreakIf
+	sReturn
 	sEq
 	sNE
 	sLT
