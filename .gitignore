@@ -2,3 +2,8 @@
 *.out
 *.swp
 *.def
+/bin
+/cmd/ptc
+/lib/pt
+*.o
+*.diffs
