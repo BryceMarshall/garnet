@@ -942,6 +942,7 @@ ConstantValue :		% An identifier token has just been accepted
 			.tLiteralString
 			oEmitValue	% string length
 			oEmitString
+            .tAssignString
 			oTypeStkPush(tpString)
 			oTypeStkLinkToStandardComponentType(stdString)
 			oTypeTblEnter
