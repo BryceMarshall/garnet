@@ -1255,7 +1255,6 @@ VariableAttributes :
         | zero :
             >
         | * :
-	    ?
             oCountDecrement
             [ oSymbolStkChooseKind
                 | syExternal:	% file parameter to program
