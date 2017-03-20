@@ -2270,7 +2270,7 @@ CompareRelationalOperandTypes :
 	% Note that chars/strings are no longer valid, as they are
 	% no longer comparable except for equality, which is
 	% handled by the CheckStringEqualityTypes rule.
-	(integer or subrange only -- chars/strings
+	% (integer or subrange only -- chars/strings
     	% are no longer comparable except for equality)
 
 	[ oTypeStkChooseKind
