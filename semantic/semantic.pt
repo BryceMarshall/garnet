@@ -2439,7 +2439,9 @@ program SemanticAnalysis (output, semanticSsl, parseStream, temp, tCode, options
 			case typeStkKind[typeStkTop] of
 			    tpInteger, tpSubrange:
 				dataAreaEnd := dataAreaEnd + wordSize;
-			    tpString, tpBoolean:
+				tpString:
+				dataAreaEnd := dataAreaEnd + stringSize;
+			    tpBoolean:
 				dataAreaEnd := dataAreaEnd + byteSize;
 			    tpArray, tpPackedArray:
 				begin
