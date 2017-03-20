@@ -926,6 +926,7 @@ ConstantValue :		% An identifier token has just been accepted
 		oSymbolStkEnterValue
 		oValuePop
 	    | sLiteral:
+        % Assign constant strings as variables
         oSymbolStkSetKind(syVariable)
 		oValuePushStringLength
 		[ oValueChoose
@@ -938,12 +939,12 @@ ConstantValue :		% An identifier token has just been accepted
 		    | *:
             .tAssignBegin
             .tLiteralAddress
-            oValuePushSymbol
-            oEmitValue
-            oValuePop
+            oValuePushSymbol %Push symbol of string
+            oEmitValue       %Emits literal address
+            oValuePop        %Remove symbol of string
 			.tLiteralString
 			oEmitValue	% string length
-			oEmitString
+			oEmitString % string value
             .tAssignString
 			oTypeStkPush(tpString)
 			oTypeStkLinkToStandardComponentType(stdString)
@@ -958,7 +959,9 @@ ConstantValue :		% An identifier token has just been accepted
 
 TypeDefinitions :	% process a single named type definition
 
-        sIdentifier
+    % Most of this code is recycled from the original PT version,
+    % with the looping functionality removed.
+    sIdentifier
 	oSymbolStkPushLocalIdentifier
 	@TypeBody
 	[ oSymbolStkChooseKind
@@ -1224,18 +1227,18 @@ SubrangeUpperBound :
 	    | *:
 	];
 
-VariableDeclarations :
+VariableDeclarations : % Accept declarations for multiple variables of a single type
+
 	sIdentifier
 	@VariablePushStack
-	oCountPush(one)
+	oCountPush(one) %Keep track of the number of variables to allocate
 	{[
-	  | sVar :
+	  | sVar : %Handle another variable
 		sIdentifier
 		@VariablePushStack
-		oCountIncrement
-	  | * :
-        @VariableAttributes
-		%We have reached the type declaration
+		oCountIncrement 
+	  | * : %We have reached the type declaration
+        @VariableAttributes %Do the allocations here
 		>		
 	]};
 
@@ -1256,7 +1259,8 @@ VariableAttributes :
     {[ oCountChoose
         | zero :
             >
-        | * :
+        | * : % There is another variable to handle
+            % Most of this code is recycled from the original PT version
             oCountDecrement
             [ oSymbolStkChooseKind
                 | syExternal:	% file parameter to program
@@ -1339,7 +1343,7 @@ VariableAttributes :
             oTypeStkSwap
             oSymbolStkPop
     ]}
-        oCountPop
+    oCountPop %Remove our counter
 	oTypeStkPop
 	oTypeStkPop;
 
@@ -1403,8 +1407,9 @@ AllocateVar :
 
 ProcedureDefinition :
 		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
+        % The sPublic token precedes the procedure name, so we must create a case for each.
 	[
-	    | sPublic:
+	    | sPublic: %This is a public procedure, so set the kind accordingly.
 		[ oSymbolStkChooseKind
 		    | syUndefined:
 		    | syExternal:
@@ -1419,7 +1424,7 @@ ProcedureDefinition :
 		oEmitNullAddress
 		% If procedure is public, set its type to public
 		oSymbolStkSetKind(syPublicProcedure)
-	    | * :
+	    | * : % This is a normal procedure
 		[ oSymbolStkChooseKind
 		    | syUndefined:
 		    | syExternal:
@@ -1572,13 +1577,13 @@ ProcedurePrologue :
 	oCountPop;
 
 ModuleDeclarations :
-	sIdentifier oSymbolStkPushIdentifier % Might have to decide type?
+	sIdentifier oSymbolStkPushIdentifier % Module identifier doesn't need any other identification 
 	oSymbolTblEnter
-	oSymbolStkPop
-	oSymbolTblPushScope
+	oSymbolStkPop % Enter module name into symbol table and pop from stack
+	oSymbolTblPushScope % Create scope for module
 	@Block
 	oSymbolTblStripScope
-	oSymbolTblMergeScope;
+	oSymbolTblMergeScope; % Strip and merge scope, retaining public procedures
 
 Statement :
 	[
@@ -1649,7 +1654,7 @@ CallStmt :
 	    | *:
 	]
 	[ oSymbolStkChooseKind
-	    | syProcedure,syPublicProcedure:
+	    | syProcedure,syPublicProcedure: % Public procedures are also callable
 		[ oSymbolStkChooseStandardRoutine
 		    | rtReset:
 			.tTrapBegin
