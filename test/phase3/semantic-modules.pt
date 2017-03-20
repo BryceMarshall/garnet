@@ -1,6 +1,6 @@
 using progName
 module M
-    %var a: integer
+    var a: integer
     def f()
 	var b: integer
 	b=3
@@ -9,9 +9,10 @@ module M
 	var b: integer
 	b=3
     end
-    %a = 2
+    a = 2
     f()
-    g()
+    g() %Both of these should succeed
 end
-f()
-g()
+f() %This should fail
+g() %This should succeed
+

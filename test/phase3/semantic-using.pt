@@ -1,1 +1,2 @@
-using progName1, progName2
+% Handle multiple using declarations
+using progName1, progName2, progName3

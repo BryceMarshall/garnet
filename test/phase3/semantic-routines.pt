@@ -1,12 +1,15 @@
 using progName
+% Test routines in general
 def P()
     var a: integer
     a = 2
 end
+% Test routines with a single argument
 def Q(a: integer)
    var b: integer
    b = a + 2
 end
+% Test var arguments, and multiple arguments
 def R(var a: integer, var b: integer)
    var c: integer
    b = a + 2
