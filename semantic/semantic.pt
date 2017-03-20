@@ -2450,6 +2450,8 @@ program SemanticAnalysis (output, semanticSsl, parseStream, temp, tCode, options
 				    if (typeStkKind[typeStkTop-1] = tpInteger) or
 					   (typeStkKind[typeStkTop-1] = tpSubrange) then
 					size := size * wordSize;
+					if (typeStkKind[typeStkTop-1] = tpString) then
+                    size := size * stringSize;
 
 				    dataAreaEnd := dataAreaEnd + size
 				end;
