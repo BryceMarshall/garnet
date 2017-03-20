@@ -15,6 +15,13 @@
 %   "t-code", corresponding semantically to the source program.
 %
 
+
+
+% Token definitions, and rules corresponding to the char type were
+% changed to that of the string type. Additionally, strings are now
+% handled as first-class values, being treated as direct operands in
+% the Garnet runtime model rather than as char arrays.
+
 Input :
 	sIdentifier 
 	firstInputToken = sIdentifier
@@ -574,9 +581,9 @@ type TrapKind :
 	trWrite = 5
 	trWriteln = 6
 	trWriteInteger = 8
-	trWriteString = 109
+	trWriteString = 109     % trap number for string write in Garnet runtime
 	trReadInteger = 10
-	trReadString = 108
+	trReadString = 108      % trap number for string read in Garnet runtime
 	trAssign = 12;
 
 
@@ -1998,6 +2005,7 @@ Operand :
 		oEmitValue
 		oValuePop
 	    | sLiteral:
+	    % handle strings as first-class values rather than char arrays
 		oValuePushStringLength
 		[ oValueChoose
 		    | zero:
@@ -2034,6 +2042,7 @@ UnaryOperator :
 		.tNot
 		oTypeStkPush(tpBoolean)
 		| sLength:
+		% handle string length unary operation and the corresponding type checks
 		.tLength
 		oTypeStkPush(tpInteger)	% result type
 		oSymbolStkSetKind(syExpression)
@@ -2052,7 +2061,7 @@ BinaryOperator :
 	% Could make this a cycle (comment applies to UnaryOperator as well)
 	% but that would probably be less efficient on average.
 	[
-	    | sAdd:
+	    | sAdd: % handle string concatenation if the top of the type stack is a string
 	    [ oTypeStkChooseKind
             | tpInteger:
             .tAdd
@@ -2083,16 +2092,16 @@ BinaryOperator :
 		@CompareOperandAndResultTypes
 	    | sEq:
 		[ oTypeStkChooseKind
-		    | tpString:
-		    @CheckStringEquality
+		    | tpString: % handle string equality if the top of the type stack is a string
+		    @CheckStringEqualityTypes
 		    | *:
 		    .tEq
 		    @CompareRelationalOperandTypes
 		]
 	    | sNE:
 	    [ oTypeStkChooseKind
-            | tpString:
-            @CheckStringEquality
+            | tpString: % handle string inequality if the top of the type stack is a string
+            @CheckStringEqualityTypes
             .tNot
             | *:
             .tNE
@@ -2123,6 +2132,7 @@ BinaryOperator :
 		oTypeStkPush(tpInteger)
 		@CompareOperandAndResultTypes
 		| sIndex:
+		% handle the string index binary operation
 		.tIndex
 		oTypeStkPush(tpInteger) % result type
 		@SwapAndCheckStringAndPop   % second operand must be a string
@@ -2134,6 +2144,8 @@ BinaryOperator :
 	];
 
 TernaryOperator :
+    % Handle the string substring ternary operation.
+    % The appropriate number of symbols must be popped at the end.
 	[
 	    | sSubstring:
 	    .tSubstring
@@ -2149,24 +2161,28 @@ TernaryOperator :
 	];
 
 SwapAndCheckIntegerAndPop :
+    % Swap the top of the type stack (the result type) with the entry
+    % below it (the operand type being checked). Ensure that the operand
+    % is an integer.
     oTypeStkSwap
     [ oTypeStkChooseKind
         | tpInteger:
         | *:
         #eTypeMismatch
     ]
-    oTypeStkPop
-;
+    oTypeStkPop;
 
 SwapAndCheckStringAndPop :
+    % Swap the top of the type stack (the result type) with the entry
+    % below it (the operand type being checked). Ensure that the operand
+    % is a string.
     oTypeStkSwap
-    [ oTypeStkChooseKind    % first operand must be a string
+    [ oTypeStkChooseKind
         | tpString:
         | *:
         #eTypeMismatch
     ]
-    oTypeStkPop
-;
+    oTypeStkPop;
 
 CompareAndSwapTypes :
 	% Compare the top two type stack entries for assignment
@@ -2231,7 +2247,9 @@ CompareOperandAndResultTypes :
 	oSymbolStkPop
 	oSymbolStkSetKind(syExpression);
 
-CheckStringEquality :
+CheckStringEqualityTypes :
+    % Used to handle the string "equals" operator as well as the
+    % "not equals" operator (by negating the operation afterward).
     .tStringEqual
     oTypeStkPop
     [ oTypeStkChooseKind
@@ -2247,9 +2265,13 @@ CheckStringEquality :
 CompareRelationalOperandTypes :
 	% Verify that the types of the two operands are assignment
 	% compatible and that they are valid relational expression
-	% operand types (integer or subrange -- this no longer includes
-	% chars/strings).  Pop the operand symbol and type stack
+	% operand types.  Pop the operand symbol and type stack
 	% entries and push result symbol and type stack entries.
+	% Note that chars/strings are no longer valid, as they are
+	% no longer comparable except for equality, which is
+	% handled by the CheckStringEqualityTypes rule.
+	(integer or subrange only -- chars/strings
+    	% are no longer comparable except for equality)
 
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange:
