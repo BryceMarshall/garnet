@@ -1,5 +1,17 @@
 using progName
 module M
     %var a: integer
+    def f()
+	var b: integer
+	b=3
+    end
+    def * g()
+	var b: integer
+	b=3
+    end
     %a = 2
+    f()
+    g()
 end
+f()
+g()
