@@ -1201,21 +1201,27 @@ CaseEnd:
 EmitDefaultCaseAbort:
     % Emit a case abort alternative to handle selector values
     % which do not match a label.
+    [ | tCaseElse :     % If case else exists, handle it
+        @Statements
+        tCaseMerge
+        oEmitCaseMergeBranch
 
-    oCaseEnterAbortAddress		% aNNN:
-    % Save the abort address for use by the selector out-of-range error
-    % checks in the EmitCaseSubscriptJump rule.
-    oFixPushAddress			% bNNN:		(label for abort)
-    oFixSwapAddresses			% (keep branch around case body on top)
-    oEmitMergeSourceCoordinate
-    oOperandPushMode(mLineNum)		% ... n
-    oOperandSetLength(word)
-    @OperandForceToStack		%	pushl	n
-    oOperandPop				% ...
-    oOperandPushMode(mTrap)
-    oOperandSetValue(trCaseAbort)
-    oEmitSingle(iCall)			% 	call  caseAbort
-    oOperandPop;
+      | * :             % If case else doesn't exist, generate abort trap
+            oCaseEnterAbortAddress		% aNNN:
+            % Save the abort address for use by the selector out-of-range error
+            % checks in the EmitCaseSubscriptJump rule.
+            oFixPushAddress			% bNNN:		(label for abort)
+            oFixSwapAddresses			% (keep branch around case body on top)
+            oEmitMergeSourceCoordinate
+            oOperandPushMode(mLineNum)		% ... n
+            oOperandSetLength(word)
+            @OperandForceToStack		%	pushl	n
+            oOperandPop				% ...
+            oOperandPushMode(mTrap)
+            oOperandSetValue(trCaseAbort)
+            oEmitSingle(iCall)			% 	call  caseAbort
+            oOperandPop;
+    ]
 
 
 EmitCaseSubscriptJump:
