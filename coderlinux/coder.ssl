@@ -30,7 +30,7 @@
 
 Input:		% corresponds to semantic.ssl output
 	tMultiply 
-	firstOutputToken = tMultiply
+	firstInputToken = tMultiply
 	tDivide
 	tModulus
 	tAdd
@@ -97,7 +97,7 @@ Input:		% corresponds to semantic.ssl output
 
 	% Compound T-codes are those that take operands
 	tLiteralAddress
-	firstCompoundOutputToken = tLiteralAddress
+	firstCompoundToken = tLiteralAddress
 	tLiteralInteger
 	tLiteralBoolean
 	tLiteralString
@@ -113,10 +113,10 @@ Input:		% corresponds to semantic.ssl output
 	tCallEnd
 	tLineNumber
 	tTrap
-	lastCompoundOutputToken = tTrap
+	lastCompoundToken = tTrap
 
 	tEndOfFile
-	lastOutputToken = tEndOfFile;
+	lastInputToken = tEndOfFile;
 
 
 Error:
