@@ -848,8 +848,8 @@ Statements:
 	    @IfStmt
 	| tWhileBegin:
 	    @WhileStmt
-	| tRepeatBegin:
-	    @RepeatStmt
+	| tDoBegin:
+	    @DoStmt
 	| tCaseBegin:
 	    @CaseStmt
 	| tWriteBegin:
@@ -1076,42 +1076,56 @@ SkipToEndWhile:
         | *:
             ?                          	% accept and ignore anything else
     ]};
-
-
-RepeatStmt:
+    
+DoStmt:
     % Save the target address for the top-of-loop branch
     oFixPushAddress				% bNNN:
     oEmitMergeSourceCoordinate
-    @Statements					% loop body
-    tRepeatControl
-    @OperandPushBooleanControlExpression 	% ... cond
-    tRepeatTest
+    @Statements
+    @OperandPushBooleanControlExpression	% ... cond
+    tDoTest
 
-    % Optimize if loop condition is known at compile time
+    % Optimize if the condition is know at compile time
     [ oOperandChooseJumpCondition
-	| iJnever:
-            % Exit condition is always false (until false) - an infinite loop.
-            % false branches fall through to top-of-loop backward branch
+	    | iJnever:
+            % Exit condition is always false - an infinite loop.
+            % emit no conditional branch, just fall into loop body
             oFixAndFreeFalseBranches
-            oEmitUnconditionalBackwardBranch 	%  jmp      bNN
 
         | iJalways:
-            % Exit condition is always true (until true) - loop never repeats.
-            % fall through without backward branch
+            % Exit condition is always true (break if true) - a nop.
+            % flush the loop body
             oFixAndFreeFalseBranches
+            @SkipToEndDo
+            oFixPopAddress
+            oFixAndFreeShuntList        	% fNN:, just in case
+            oOperandPop
+            >>
 
-	| *:
-	    % Emit a conditional forward branch to exit the loop.
-	    % True branches follow the conditional exit path, false
-	    % branches fall through to the top-of-loop branch.
-	    @OperandInfixOr			%	jcond	fNNN
-	    oEmitUnconditionalBackwardBranch	% 	jmp	bNNN
+	     | *:
+	        % Emit a conditional forward branch to exit the loop.
+	        % True (inverted false) branches follow the conditional
+	        % exit path, false branches fall through to the loop body.
+	        @OperandInfixOr			%	jcond	fNNN
     ]
 
+    @Statements					% loop body
+    tDoEnd
+    oEmitUnconditionalBackwardBranch		% 	jmp	bNNN
     oFixPopAddress
-    % Fix the true branches exiting the statement
     oFixAndFreeShuntList			% fNNN:
     oOperandPop;
+
+
+SkipToEndDo:
+    {[
+        | tDoEnd:
+            >
+        | tDoBegin:                 	% ignore nested do statements
+            @SkipToEndDo
+        | *:
+            ?                          	% accept and ignore anything else
+    ]};
 
 
 CaseStmt:
