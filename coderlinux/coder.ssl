@@ -150,7 +150,6 @@ type Integer:
     trReadln = 4
     trWrite = 5
     trWriteln = 6
-    trWriteString = 7
     trWriteInteger = 8
     trWriteChar = 9
     trReadInteger = 10
