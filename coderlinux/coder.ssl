@@ -160,10 +160,20 @@ type Integer:
     trCaseAbort = 14
     trEoln = 15
     trEof = 16
+    trAssignString = 101
+    trChrString = 102
+    trConcatenate = 103
+    trSubstring = 104
+    trLength = 105
+    trStringIndex = 106
+    trStringEqual = 107
+    trReadString = 108
+    trWriteString = 109
 
     % Data kinds
     byte = 1
-    word = 2;	% 4 bytes on x86
+    word = 2	% 4 bytes on x86
+    string = 3;
 
 
 type Boolean:
