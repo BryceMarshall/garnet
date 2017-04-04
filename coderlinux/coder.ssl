@@ -1635,10 +1635,7 @@ OperandSubscriptIntegerPop:
 
 
 OperandSubscriptStringPop:
-    % if the subscript is manifest fold it out,
-    % otherwise generate subscripting code
-    @OperandSubscriptNonManifestStringPop
-    oOperandSetLength(string);
+    ;
 
 
 OperandSubscriptCharPop:
@@ -2004,8 +2001,6 @@ OperandPushExpressionAssignPopPop:
 	| tAssignBoolean:
 	    @OperandAssignBooleanPopPop
 	    >
-    | tSubscriptString:
-        @OperandSubscriptStringPopPop
     | tConcatenate
         @OperandConcatenatePop
     | tSubstring
