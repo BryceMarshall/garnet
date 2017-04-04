@@ -821,12 +821,20 @@ Routine:
 		    @OperandPopAndFreeTemp	% ... 8(%ebp), formal
 		    @OperandPopAndFreeTemp	% ... 8(%ebp)
 
-		| tStoreParmChar, tStoreParmBoolean:
+		| tStoreParmBoolean:
 		    oOperandSwap		% ... formal, 8(%ebp)
 		    oOperandPushCopy		% ... formal, 8(%ebp), 8(%ebp)
 		    oOperandSwapLeftAndDest	% ... 8(%ebp), formal, 8(%ebp)
 		    oOperandSetLength(byte)
 		    @EmitMove			%	movl	8(%ebp),formal
+		    @OperandPopAndFreeTemp	% ... 8(%ebp), formal
+		    @OperandPopAndFreeTemp	% ... 8(%ebp)
+        | tStoreParmString:
+		    oOperandSwap		% ... formal, 8(%ebp)
+		    oOperandPushCopy		% ... formal, 8(%ebp), 8(%ebp)
+		    oOperandSwapLeftAndDest	% ... 8(%ebp), formal, 8(%ebp)
+            oOperandSetLength(string)
+            @OperandAssignStringPopPop
 		    @OperandPopAndFreeTemp	% ... 8(%ebp), formal
 		    @OperandPopAndFreeTemp	% ... 8(%ebp)
 		| tParmEnd:	  
@@ -2833,6 +2841,11 @@ OperandAssignIntegerPopPop:
 	    @OperandPopAndFreeTemp
 	    @OperandPopAndFreeTemp
     ];
+
+OperandAssignStringPopPop:
+    @SaveTempRegsToStack
+    %Put Logic Here
+    @RestoreTempRegsFromStack
 
 
 OperandAssignCharPopPop:
