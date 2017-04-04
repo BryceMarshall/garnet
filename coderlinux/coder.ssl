@@ -284,11 +284,6 @@ mechanism OperandStack:
     oOperandChooseJumpCondition >> JumpCondition
 	% Return the top entry's jump condition (kind field)
 
-    oOperandPushStringDescriptor
-	% Push an entry with addressing mode manifest, length word and
-	% a value set to the data area address of the string referenced
-	% by the last accepted tStringDescriptor tcode.
-
     oOperandPushProcedure
 	% Push an entry with addressing mode manifest and whose value is
 	% the code area address of the procedure referenced by the last
@@ -723,7 +718,7 @@ Block:
     % array bounds and file descriptors which are emitted as assignment
     % statements, nested procedure definitions and finally statements.
     {[
-	| tSkipString:
+	| tLiteralString:
             % Emit a string constant to the data area
             oEmitNone(iData)                    %       .data
             tLiteralString
@@ -1503,21 +1498,13 @@ OperandPushExpression:
 	    oOperandPushInteger
 	| tLiteralBoolean:
 	    oOperandPushBoolean
-	| tStringDescriptor:
-	    oOperandPushStringDescriptor
-	    % Get a string literal's address
-	    @EmitStringDescriptor		%	lea	sNNN, %T
-	| tSkipString:
+	| tLiteralString:
 	    % Emit string literal to data area
 	    oEmitNone(iData)			%	.data
 	    % Emit the string
 	    tLiteralString
 	    oEmitString				% sNNN:	.asciz	"SSSSS"
 	    oEmitNone(iText)			%	.text
-	    % Get the string literal's address
-	    tStringDescriptor
-	    oOperandPushStringDescriptor
-	    @EmitStringDescriptor		%	lea	sNNN, %T
 	| tNegate:
 	    @OperandNegate
 	| tAdd:
@@ -1571,13 +1558,6 @@ OperandPushExpression:
     ]};
 
 
-EmitStringDescriptor:
-    % Get the address of a string into a temp reg.
-    % The descriptor is already on the operand stack.
-
-    @OperandForceAddressIntoTemp;	%	lea	sNNN, %T
-
-
 OperandPushVariable:
     % A tLiteralAddress has just been accepted
     oOperandPushVariable
@@ -1595,8 +1575,8 @@ OperandPushVariable:
 	    [
 		| tSubscriptInteger:
 		    @OperandSubscriptIntegerPop
-		| tSubscriptChar:
-		    @OperandSubscriptCharPop
+		| tSubscriptString:
+		    @OperandSubscriptStringPop
 		| tSubscriptBoolean:
 		    @OperandSubscriptBooleanPop
 	    ]
@@ -1605,7 +1585,9 @@ OperandPushVariable:
     ]
     [
 	| tFetchInteger:
-	| tFetchChar, tFetchBoolean:
+	| tFetchString:
+	    oOperandSetLength(string)
+	| tFetchBoolean:
  	    oOperandSetLength(byte)
 	| *: 
 	    % Value is not to be loaded
@@ -1632,6 +1614,13 @@ OperandSubscriptIntegerPop:
 	    @OperandSubscriptNonManifestIntegerPop
     ]
     oOperandSetLength(word);
+
+
+OperandSubscriptStringPop:
+    % if the subscript is manifest fold it out,
+    % otherwise generate subscripting code
+    @OperandSubscriptNonManifestStringPop
+    oOperandSetLength(string);
 
 
 OperandSubscriptCharPop:
@@ -1991,12 +1980,22 @@ OperandPushExpressionAssignPopPop:
 	| tAssignInteger:
 	    @OperandAssignIntegerPopPop
 	    >
-	| tAssignChar:
-	    @OperandAssignCharPopPop
+	| tAssignString:
+	    @OperandAssignStringPopPop
 	    >
 	| tAssignBoolean:
 	    @OperandAssignBooleanPopPop
 	    >
+    | tSubscriptString:
+        @OperandSubscriptStringPopPop
+    | tConcatenate
+        @OperandConcatenatePop
+    | tSubstring
+        @OperandSubstringPopPop
+    | tIndex
+        @OperandIndexPop
+    | tLength
+        @OperandLength
 	| tNegate:
 	    [
 		| tAssignInteger:
@@ -2073,22 +2072,12 @@ OperandPushExpressionAssignPopPop:
 	| tLE:
 	    @OperandGreaterPop
 	    @OperandNot
+    | tStringEqual:
+        @OperandStringEqualPop
 	| tChr:
-	    [
-		| tAssignChar:
-		    @OperandChrAssignPopPop
-		    >
-		| *:
-		    @OperandChr
-	    ]
+	    @OperandChr
 	| tOrd:
-	    [
-		| tAssignInteger:
-		    @OperandOrdAssignPopPop
-		    >
-		| *:
-		    @OperandOrd
-	    ]
+        @OperandOrd
 	| tEoln:
 	    @OperandEolnFunction
 	| tEOF:
@@ -2615,10 +2604,6 @@ OperandModPop:
 
 OperandChrAssignPopPop:
     % Assume operand's value is in range
-    % x := y;  x byte, y word
-    @OperandForceIntoTemp	%	movl	y, %T
-    oOperandSetLength(byte)	% (treat word in reg as byte to get
-				%  the low order byte of the word)
     oEmitDouble(iMov)		% 	movb	%T, x
     @OperandPopAndFreeTemp
     @OperandPopAndFreeTemp;
@@ -2626,24 +2611,10 @@ OperandChrAssignPopPop:
 
 OperandChr:
     % Assume operand's value is in range
-    @OperandForceIntoTemp	
-    oOperandSetLength(byte);	% see comments above
-
-
-OperandOrdAssignPopPop:
-    % x := y;  x word, y byte
-    oOperandPushMode(mManifest)
-    oOperandSetValue(zero)
-    oOperandSetLength(word)
-    @OperandForceIntoTemp	% 	movl	$0, %T
-    oOperandSetLength(byte)
-    oOperandSwap
-    oEmitDouble(iMov)		% 	movb 	y, %T
-    @OperandPopAndFreeTemp
-    oOperandSetLength(word)
-    oEmitDouble(iMov)  		% 	movl 	%T, x
-    @OperandPopAndFreeTemp
-    @OperandPopAndFreeTemp;
+    % x := y;  x byte, y word
+    @OperandForceIntoTemp	    %	movl	y, %T
+    oOperandSetLength(byte);    % (treat word in reg as byte to get
+				                %  the low order byte of the word)
 
 
 OperandOrd:
@@ -2882,6 +2853,32 @@ OperandAssignBooleanPopPop:
     @OperandAssignCharPopPop;
 
 
+OperandAssignStringPopPop:
+    % Generate code to assign the right (top) operand's value to
+    % the left (second) operand and pop both operands.
+
+    oOperandSetLength(string)
+    @EmitMove			%	movl	y, x
+    @OperandPopAndFreeTemp
+    @OperandPopAndFreeTemp;
+
+
+OperandConcatenatePop:
+    ;
+
+
+OperandSubstringPopPop:
+    ;
+
+
+OperandIndexPop:
+    ;
+
+
+OperandLength:
+    ;
+
+
 OperandPopAndFreeTemp:
     % If the top operand has a temporary in it, free it. 
     % Pop the top operand.
@@ -3069,6 +3066,10 @@ OperandLessPop:
     % x < y  =  y > x
     oOperandSwap		
     @OperandGreaterPop;		
+
+
+OperandStringEqualPop:
+    ;
 
 
 OperandFoldComparisonPopPop:
