@@ -1513,6 +1513,14 @@ OperandPushExpression:
 	    tLiteralString
 	    oEmitString				% sNNN:	.asciz	"SSSSS"
 	    oEmitNone(iText)			%	.text
+    | tConcatenate
+        @OperandConcatenatePop
+    | tSubstring
+        @OperandSubstringPopPop
+    | tIndex
+        @OperandIndexPop
+    | tLength
+        @OperandLength
 	| tNegate:
 	    @OperandNegate
 	| tAdd:
@@ -1553,6 +1561,8 @@ OperandPushExpression:
 	| tLE:
 	    @OperandGreaterPop
 	    @OperandNot
+    | tStringEqual:
+        @OperandStringEqualPop
 	| tChr:
 	    @OperandChr
 	| tOrd:
@@ -2842,11 +2852,6 @@ OperandAssignIntegerPopPop:
 	    @OperandPopAndFreeTemp
     ];
 
-OperandAssignStringPopPop:
-    @SaveTempRegsToStack
-    %Put Logic Here
-    @RestoreTempRegsFromStack
-
 
 OperandAssignCharPopPop:
     % Generate code to assign the right (top) operand's value to
@@ -2867,13 +2872,9 @@ OperandAssignBooleanPopPop:
 
 
 OperandAssignStringPopPop:
-    % Generate code to assign the right (top) operand's value to
-    % the left (second) operand and pop both operands.
-
-    oOperandSetLength(string)
-    @EmitMove			%	movl	y, x
-    @OperandPopAndFreeTemp
-    @OperandPopAndFreeTemp;
+    @SaveTempRegsToStack
+    %Put Logic Here
+    @RestoreTempRegsFromStack;
 
 
 OperandConcatenatePop:
