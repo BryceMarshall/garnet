@@ -2957,7 +2957,7 @@ OperandConcatenatePop:
     oEmitSingle(iCall)          % jsr   pttrapNN
     oOperandPop
 
-    %% Pop argument
+    %% Pop arguments
     oOperandPushMode(mStackReg)
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
@@ -3007,7 +3007,7 @@ OperandIndexPop:
     oEmitSingle(iCall)          % jsr   pttrapNN
     oOperandPop
 
-    %% Pop argument
+    %% Pop arguments
     oOperandPushMode(mStackReg)
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
@@ -3034,7 +3034,46 @@ OperandIndexPop:
 
 
 OperandLength:
-    ;
+    % Get the integer length of the top operand.
+
+    %% Save temporary registers
+    @SaveTempRegsToStack
+
+    %% Push operands to run stack
+    @OperandForceIntoTemp       % ... %T
+    @OperandForceToStack        % ...
+
+    %% Call string length trap
+    oOperandPushMode(mTrap)
+    oOperandSetValue(trLength)
+    oOperandSetLength(word)
+    oEmitSingle(iCall)          % jsr   pttrapNN
+    oOperandPop
+
+    %% Pop argument
+    oOperandPushMode(mStackReg)
+    oOperandSetLength(word)
+    oOperandPushMode(mManifest)
+    oOperandSetLength(word)
+    oOperandSetValue(two)
+    oEmitDouble(iAdd)           % 	addl 	$4, %esp
+    oOperandPop
+    oOperandPop
+
+    %% Save result to scratch register
+    oOperandPushMode(mScratchReg1)
+    oOperandSetLength(word)
+    oOperandPushMode(mResultReg)
+    oOperandSetLength(word)
+    oEmitDouble(iMov)           %       movl    %eax, %S1
+    oOperandPop                 % %eax
+
+    %% Restore temp regs
+    @RestoreTempRegsFromStack	%	popl	%edx .. $eax
+
+    %% Force result to temp
+    @OperandForceIntoTemp       %       movl %S1, %T
+    oOperandSetLength(word);
 
 
 OperandPopAndFreeTemp:
