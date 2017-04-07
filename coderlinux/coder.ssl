@@ -299,6 +299,11 @@ mechanism OperandStack:
 
     oOperandChooseJumpCondition >> JumpCondition
 	% Return the top entry's jump condition (kind field)
+    
+    oOperandPushStringDescriptor
+    % Push an entry with addressing mode manifest, length word and
+    % a value set to the data area address of the string referenced
+    % by the last accepted tStringDescriptor tcode.
 
     oOperandPushProcedure
 	% Push an entry with addressing mode manifest and whose value is
