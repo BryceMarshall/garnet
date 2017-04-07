@@ -2629,19 +2629,47 @@ OperandModPop:
     @OperandForceIntoTemp;              % ... %T
 
 
-OperandChrAssignPopPop:
-    % Assume operand's value is in range
-    oEmitDouble(iMov)		% 	movb	%T, x
-    @OperandPopAndFreeTemp
-    @OperandPopAndFreeTemp;
-
-
 OperandChr:
-    % Assume operand's value is in range
-    % x := y;  x byte, y word
-    @OperandForceIntoTemp	    %	movl	y, %T
-    oOperandSetLength(byte);    % (treat word in reg as byte to get
-				                %  the low order byte of the word)
+    % Generate code to convert an integer to its character value
+    % and get the address of the string result
+
+    %% Save temporary registers
+    @SaveTempRegsToStack
+
+    %% Push operand to run stack
+    @OperandForceToStack        % ...
+
+    %% Call chr trap
+    oOperandPushMode(mTrap)
+    oOperandSetValue(trChr)
+    oOperandSetLength(word)
+    oEmitSingle(iCall)          % jsr   pttrapNN
+    oOperandPop
+
+    %% Pop argument
+    oOperandPushMode(mStackReg)
+    oOperandSetLength(word)
+    oOperandPushMode(mManifest)
+    oOperandSetLength(word)
+    oOperandSetValue(four)
+    oEmitDouble(iAdd)           % 	addl 	$4, %esp
+    oOperandPop
+    oOperandPop
+
+    %% Save result to scratch register
+    oOperandPushMode(mScratchReg1)
+    oOperandSetLength(word)
+    oOperandPushMode(mResultReg)
+    oOperandSetLength(word)
+    oEmitDouble(iMov)           %       movl    %eax, %S1
+    oOperandPop                 % %eax
+
+    %% Restore temp regs
+    @RestoreTempRegsFromStack	%	popl	%edx .. $eax
+
+    %% Force result to temp
+    @OperandForceIntoTemp       %       movl %S1, %T
+    oOperandSetLength(word);
 
 
 OperandOrd:
