@@ -2940,7 +2940,7 @@ OperandConcatenatePop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(four)
+    oOperandSetValue(eight)
     oEmitDouble(iAdd)           % 	addl 	$8, %esp
     oOperandPop
     oOperandPop
@@ -3034,7 +3034,7 @@ OperandIndexPop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(four)
+    oOperandSetValue(eight)
     oEmitDouble(iAdd)           % 	addl 	$8, %esp
     oOperandPop
     oOperandPop
@@ -3077,7 +3077,7 @@ OperandLength:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(two)
+    oOperandSetValue(four)
     oEmitDouble(iAdd)           % 	addl 	$4, %esp
     oOperandPop
     oOperandPop
@@ -3312,7 +3312,7 @@ OperandStringEqualPop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(four)
+    oOperandSetValue(eight)
     oEmitDouble(iAdd)           % 	addl 	$8, %esp
     oOperandPop
     oOperandPop
