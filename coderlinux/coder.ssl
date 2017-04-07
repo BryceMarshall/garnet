@@ -300,10 +300,10 @@ mechanism OperandStack:
     oOperandChooseJumpCondition >> JumpCondition
 	% Return the top entry's jump condition (kind field)
     
-    oOperandPushStringDescriptor
+    oOperandPushString
     % Push an entry with addressing mode manifest, length word and
     % a value set to the data area address of the string referenced
-    % by the last accepted tStringDescriptor tcode.
+    % by the last accepted tLiteralString tcode.
 
     oOperandPushProcedure
 	% Push an entry with addressing mode manifest and whose value is
@@ -740,11 +740,12 @@ Block:
     % statements, nested procedure definitions and finally statements.
     {[
 	| tLiteralString:
-            % Emit a string constant to the data area
-            oEmitNone(iData)                    %       .data
-            tLiteralString
-            oEmitString                         % sNN:  .asciz  "SSSSS"
-            oEmitNone(iText)                    %       .text
+        % Emit a string constant to the data area
+        oEmitNone(iData)                    %       .data
+        oEmitString                         % sNN:  .asciz  "SSSSS"
+        oEmitNone(iText)                    %       .text
+        oOperandPushString                  % ... sNN
+        @OperandForceIntoTemp               % ... %T
 	| tLiteralInteger:
 	    % initialize an array or file descriptor
 	    oOperandPushInteger			% ... lower bound / file number
@@ -1527,11 +1528,11 @@ OperandPushExpression:
 	    oOperandPushBoolean
 	| tLiteralString:
 	    % Emit string literal to data area
-	    oEmitNone(iData)			%	.data
-	    % Emit the string
-	    tLiteralString
-	    oEmitString				% sNNN:	.asciz	"SSSSS"
-	    oEmitNone(iText)			%	.text
+        oEmitNone(iData)                    %       .data
+        oEmitString                         % sNN:  .asciz  "SSSSS"
+        oEmitNone(iText)                    %       .text
+        oOperandPushString                  % ... sNN
+        @OperandForceIntoTemp               % ... %T
     | tConcatenate
         @OperandConcatenatePop
     | tSubstring
