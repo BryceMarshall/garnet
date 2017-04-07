@@ -2645,14 +2645,19 @@ OperandChr:
 
 
 OperandOrd:
-    % Byte operand is on top of operand stack
-    oOperandPushMode(mManifest)
+    % Convert the first character of the top operand into an integer
+
+    @OperandForceIntoTemp %... %T
+    oOperandSetMode(mTempIndirect)
+
+    oOperandPushMode(mManifest) %... %T, $0
     oOperandSetValue(zero)
     oOperandSetLength(word)
-    @OperandForceIntoTemp	% 	movl	$0, %T
+    @OperandForceIntoTemp	% 	movl	$0, %X
+                            % ... %T %X
     oOperandSetLength(byte)
     oOperandSwap
-    oEmitDouble(iMov)		% 	movb 	y, %T
+    oEmitDouble(iMov)		% 	movb 	%T, %X
     @OperandPopAndFreeTemp
     oOperandSetLength(word);
 
