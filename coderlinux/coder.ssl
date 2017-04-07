@@ -1618,7 +1618,8 @@ OperandPushVariable:
     [
 	| tFetchInteger:
 	| tFetchString:
-	    oOperandSetLength(string)
+        @OperandForceAddressIntoTemp
+        oOperandSetMode(mTempIndirect)  %Not sure of this one
 	| tFetchBoolean:
  	    oOperandSetLength(byte)
 	| *: 
