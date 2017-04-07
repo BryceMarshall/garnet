@@ -2,6 +2,9 @@
 %
 %  Date  30 Jun 1980
 %	 (Revised 2 January 2014)
+%%%%%%%%%%% ADDED 
+%        (Revised for Garnet 3 Feb 2017)
+%%%%%%%%%%% 
 %
 %  Author  Alan Rosselet
 %
@@ -15,30 +18,29 @@
 %   "t-code", corresponding semantically to the source program.
 %
 
-
-
-% Token definitions, and rules corresponding to the char type were
-% changed to that of the string type. Additionally, strings are now
-% handled as first-class values, being treated as direct operands in
-% the Garnet runtime model rather than as char arrays.
-
 Input :
 	sIdentifier 
 	firstInputToken = sIdentifier
-    firstSemanticToken = sIdentifier
+	firstSemanticToken = sIdentifier
 	firstCompoundSemanticToken = sIdentifier
 	sInteger
 	sLiteral
 	lastCompoundSemanticToken = sLiteral
 
-	sProgram
+%%%%%%%%%%% CHANGED
+%	sProgram
+%%%%%%%%%%% 
+	sUsing
+%%%%%%%%%%% 
 	sParmBegin
 	sParmEnd
 	sConst
 	sType
 	sVar
 	sProcedure
+%%%%%%%%%%% ADDED 
 	sPublic
+%%%%%%%%%%% 
 	sBegin
 	sEnd
 	sNegate
@@ -59,10 +61,17 @@ Input :
 	sThen
 	sElse
 	sWhileStmt
+%%%%%%%%%%% CHANGED
+%	sRepeatStmt
+%	sRepeatEnd
+%%%%%%%%%%% 
 	sModule
 	sDoStmt
 	sBreakIf
+%%%%%%%%%%% 
+%%%%%%%%%%% ADDED 858 
 	sReturn
+%%%%%%%%%%% 
 	sEq
 	sNE
 	sLT
@@ -78,10 +87,12 @@ Input :
 	sOr
 	sInfixAnd
 	sAnd
-	sNot 
+	sNot
+%%%%%%%%%%% ADDED 
 	sSubstring
 	sLength
 	sIndex
+%%%%%%%%%%% 
 	sNewLine
 	sEndOfFile
 	lastInputToken = sEndOfFile;
@@ -112,21 +123,21 @@ Output :	% corresponds to coder.ssl input
 	tVarParm
 	tFetchAddress
 	tFetchInteger
-	tFetchString
+	tFetchString 		%%%%%%%%%%% CHANGED
 	tFetchBoolean
 	tAssignBegin
 	tAssignAddress
 	tAssignInteger
-	tAssignString
+	tAssignString		%%%%%%%%%%% CHANGED
 	tAssignBoolean
 	tStoreParmAddress
 	tStoreParmInteger
-	tStoreParmString
+	tStoreParmString 	%%%%%%%%%%% CHANGED
 	tStoreParmBoolean
 	tSubscriptBegin
 	tSubscriptAddress
 	tSubscriptInteger
-	tSubscriptString
+	tSubscriptString 	%%%%%%%%%%% CHANGED
 	tSubscriptBoolean
 	tArrayDescriptor
 	tFileDescriptor
@@ -134,8 +145,13 @@ Output :	% corresponds to coder.ssl input
 	tIfEnd
 	tCaseBegin
 	tWhileBegin
+%%%%%%%%%%% CHANGED
+%	tRepeatBegin
+%	tRepeatControl
+%%%%%%%%%%% 
 	tDoBegin
-	tDoControl
+	tDoBreakIf
+%%%%%%%%%%% 
 	tCallBegin
 	tParmEnd
 	tProcedureEnd
@@ -144,21 +160,29 @@ Output :	% corresponds to coder.ssl input
 	tTrapBegin
 	tWriteEnd
 	tReadEnd
-    tDoBreakIf
+%%%%%%%%%%% ADDED 
+	tCaseElse
 	tConcatenate
 	tSubstring
 	tLength
 	tIndex
 	tStringEqual
-    tCaseElse
-	tDoEnd
+%%%%%%%%%%% 
+%%%%%%%%%%% ADDED 858 
+	tFunctionResult
+%%%%%%%%%%% 
 
 	% Compound T-codes are those that take operands
 	tLiteralAddress
 	firstCompoundOutputToken = tLiteralAddress
 	tLiteralInteger
+%%%%%%%%%%% DELETED
+%	tLiteralChar
+%%%%%%%%%%% 
 	tLiteralBoolean
 	tLiteralString
+	tStringDescriptor
+	tSkipString
 	tIfThen
 	tIfMerge
 	tCaseSelect
@@ -166,7 +190,12 @@ Output :	% corresponds to coder.ssl input
 	tCaseEnd
 	tWhileTest
 	tWhileEnd
+%%%%%%%%%%% CHANGED
+%	tRepeatTest
+%%%%%%%%%%% 
 	tDoTest
+	tDoEnd
+%%%%%%%%%%% 
 	tSkipProc
 	tCallEnd
 	tLineNumber
@@ -199,11 +228,14 @@ Error :
 	eInsufficientActuals
 	eExtraActuals
 	eRecursiveCall
+%%%%%%%%%%% ADDED 858
+	eIllegalFunctionType	
+%%%%%%%%%%% 
 	eProcedureReqd
 	eTypeIdentifierReqd
 	eIntegerExpnReqd
 	eBooleanExpnReqd
-	eStringExpnReqd
+	eStringExpnReqd 	%%%%%%%%%%% CHANGED
 	eArrayVarReqd
 	eVariableReqd
 	eDuplicateLabel
@@ -213,7 +245,7 @@ Error :
 	eInputNotVisible
 	eOutputNotVisible
 	eFieldWidth
-	eStringFileVarReqd
+	eStringFileVarReqd 	%%%%%%%%%%% CHANGED
 	eWriteExpn
 	eReadVar
 	lastSslErrorCode = eReadVar;
@@ -228,8 +260,12 @@ type Integer :
 
 	% These two sizes are machine dependent
 	byteSize = 1
+%%%%%%%%%%% CHANGED
+%	wordSize = 4;
+%%%%%%%%%%% 
 	wordSize = 4
 	stringSize = 1024;
+%%%%%%%%%%% 
 
 
 type Boolean :
@@ -246,7 +282,11 @@ type PredeclaredId :
 
 	firstPredeclaredType = firstPredeclaredId
 	pidInteger = firstPredeclaredType
+%%%%%%%%%%% CHANGED
+%	pidChar
+%%%%%%%%%%% 
 	pidString
+%%%%%%%%%%% 
 	pidBoolean
 	pidText
 	lastPredeclaredType = pidText
@@ -274,7 +314,7 @@ type PredeclaredId :
 
 type StdType :
 	stdInteger
-	stdString
+	stdString 	%%%%%%%%%%% CHANGED
 	stdBoolean
 	stdText;
 
@@ -313,13 +353,13 @@ mechanism SymbolTable :
 	% Return true if any external names (program parameters)
 	% have not yet been declared.
 
+%%%%%%%%%% ADDED
     oSymbolTblStripScope
-	% Remove all identifier links to non-public symbols in this scope
+        % Strip all non-public symbols from the current scope.
 
     oSymbolTblMergeScope;
-	% Merge this lexical level with the previous one
-
-
+        % Merges (instead of popping) current scope with previous one.
+%%%%%%%%%%
 
 
 
@@ -333,11 +373,14 @@ type SymbolKind :
 	syVarParameter
 	syProcedure
 	syFunction
+%%%%%%%%%%% ADDED 
+	syModule
+	syPublicProcedure
+	syPublicFunction
+%%%%%%%%%%% 
 	syExternal
 	syExpression
-	syUndefined
-	syModule
-	syPublicProcedure;
+	syUndefined;
 
 type StdRoutine :
 	rtReset = 1
@@ -467,7 +510,7 @@ mechanism TypeTable :
 
 type TypeKind :
 	tpInteger
-	tpString
+	tpString 	%%%%%%%%%%% CHANGED
 	tpBoolean
 	tpSubrange
 	tpArray
@@ -580,11 +623,22 @@ type TrapKind :
 	trReadln = 4
 	trWrite = 5
 	trWriteln = 6
+%%%%%%%%%%% DELETED
+%	trWriteString = 7
+%%%%%%%%%%% 
 	trWriteInteger = 8
-	trWriteString = 109     % trap number for string write in Garnet runtime
+%%%%%%%%%%% DELETED
+%	trWriteChar = 9
+%%%%%%%%%%%
 	trReadInteger = 10
-	trReadString = 108      % trap number for string read in Garnet runtime
-	trAssign = 12;
+%%%%%%%%%%% DELETED
+%	trReadChar = 11;
+%%%%%%%%%%%
+	trAssign = 12
+%%%%%%%%%%% ADDED
+	trWriteString = 109
+	trReadString = 108;
+%%%%%%%%%%% 
 
 
 mechanism Emit :
@@ -778,7 +832,11 @@ rules
 
 
 Program :
-	sProgram
+%%%%%%%%%%% CHANGED
+%	sProgram
+%%%%%%%%%%% 
+	sUsing
+%%%%%%%%%%% 
 	% Program scope, distinct from implicit scope surrounding
 	% program which contains predefined names
 	oSymbolTblPushScope
@@ -858,24 +916,64 @@ Block :
 	{[
 	    | sProcedure:
 		@ProcedureDefinition
+%%%%%%%%%%% ADDED 
+	    | sModule:
+		@ModuleDefinition
+%%%%%%%%%%% 
 	    | sConst:
 		@ConstantDefinitions
 	    | sType:
 		@TypeDefinitions
 	    | sVar:
 		@VariableDeclarations
-	    | sModule: 		% Add handling for modules
-		@ModuleDeclarations
 	    | *:
 		>
 	]}
 	sBegin
 	@BeginStmt;
 
-ConstantDefinitions :		% Process a single named constant definition
+%%%%%%%%%%% ADDED 
+ModuleDefinition:
+        % Garnet module declaration - kind of like a main program, but flow through
+        sIdentifier
+        oSymbolStkPushLocalIdentifier      % class name
+        [ oSymbolStkChooseKind
+            | syUndefined:
+            | syExternal:
+                % Program parameters must be declared as file variables
+                #eExternalDeclare
+            | *:
+                #eMultiplyDefined
+                % New definition obscures old one.
+        ]
+        oSymbolStkSetKind(syModule)
+        oTypeStkPush(tpNull)
+        oTypeTblEnter
+        oSymbolStkEnterTypeReference
+        oSymbolTblEnter
+        oSymbolTblPushScope
+        @Block
+        oSymbolTblUpdate
+        oSymbolStkPop
+        oTypeTblUpdate
+        oTypeStkPop
+        oSymbolTblStripScope            % Strip non-public symbols from class scope
+        oSymbolTblMergeScope;           % Merge public symbols into the surrounding scope
+%%%%%%%%%%% 
+
+%%%%%%%%%%% CHANGED
+% ConstantDefinitions :		% Process named constant definitions
+% 	{[
+% 	    | sIdentifier:
+% 		@ConstantValue
+% 	    | *:
+% 		>
+% 	]};
+%%%%%%%%%%% 
+ConstantDefinitions :		% Process Garnet named constant definition
 	sIdentifier
 	@ConstantValue;
-
+%%%%%%%%%%% 
 
 ConstantValue :		% An identifier token has just been accepted
 	oSymbolStkPushLocalIdentifier
@@ -933,89 +1031,124 @@ ConstantValue :		% An identifier token has just been accepted
 		oSymbolStkEnterValue
 		oValuePop
 	    | sLiteral:
-        % Assign constant strings as variables
-        oSymbolStkSetKind(syVariable)
-		oValuePushStringLength
-		[ oValueChoose
-		    | zero:
-			#eNullString
-			@SymbolStkPushStringConstant
-		    %   | one:
-			%   oSymbolStkLinkToStandardType(stdString)
-			%   oSymbolStkEnterStringValue
-		    | *:
-            .tAssignBegin
-            .tLiteralAddress
-            oValuePushSymbol %Push symbol of string
-            oEmitValue       %Emits literal address
-            oValuePop        %Remove symbol of string
-			.tLiteralString
-			oEmitValue	% string length
-			oEmitString % string value
-            .tAssignString
-			oTypeStkPush(tpString)
-			oTypeStkLinkToStandardComponentType(stdString)
-			oTypeTblEnter
-			oSymbolStkEnterTypeReference
-			oTypeStkPop
-		]
-		oValuePop	% string length
+%%%%%%%%%%% CHANGED
+%		oValuePush(one)	% implicit lower bound of string index type
+%		oValuePushStringLength
+%		[ oValueChoose
+%		    | zero:
+%			#eNullString
+%			@SymbolStkPushCharConstant
+%		    | one:
+%			oSymbolStkLinkToStandardType(stdChar)
+%			oSymbolStkEnterStringValue
+%		    | *:
+%			% Emit a branch around the string since
+%			% it is stored in the code area
+%			.tSkipString
+%			oFixPushForwardBranch
+%			oEmitNullAddress
+%			.tLiteralString
+%			oEmitValue	% string length
+%			% The string "address" is the location (offset)
+%			% of the first character of the string
+%			oSymbolStkEnterCodeAddress
+%			oEmitString
+%			oFixPopForwardBranch
+%			oTypeStkPush(tpPackedArray)
+%			oTypeStkEnterBounds
+%			oTypeStkLinkToStandardComponentType(stdChar)
+%			oTypeTblEnter
+%			oSymbolStkEnterTypeReference
+%			oTypeStkPop
+%		]
+%		oValuePop	% Upper bound
+%		oValuePop	% Lower bound
+%%%%%%%%%%% 
+                % In Garnet, string constants are like vars,
+                % so compile to a var declaration and assignment
+                .tAssignBegin
+                .tLiteralAddress
+                oSymbolStkLinkToStandardType(stdString)
+                oTypeStkPushSymbol
+                oAllocateAlignOnWord    % Allocate variable
+                oSymbolStkEnterDataAddress
+                oEmitDataAddress
+                oAllocateVariable
+                oTypeStkPop
+                .tLiteralString
+                oValuePushStringLength
+                oEmitValue
+                oValuePop
+                oEmitString
+		oSymbolStkSetKind(syVariable)
+                oSymbolStkLinkToStandardType(stdString)
+                .tAssignString
+%%%%%%%%%%% 
 	]
 	oSymbolTblEnter
 	oSymbolStkPop;		% name being defined
 
-TypeDefinitions :	% process a single named type definition
+TypeDefinitions :	% process named type definitions
+%%%%%%%%%%% CHANGED
+%	{[
+%	    | sIdentifier:
+%%%%%%%%%%% 
+	sIdentifier	% only one in Garnet
+%%%%%%%%%%% 
+		oSymbolStkPushLocalIdentifier
+		@TypeBody
+		[ oSymbolStkChooseKind
+		    | syUndefined:
+		    | syExternal:
+			% Program parameters must be declared as file variables
+			#eExternalDeclare
+			% Ignore this definition
+			oSymbolStkPop
+			oTypeStkPop
+			oTypeStkPop
+			>>
+		    | *:
+			#eMultiplyDefined
+			% The new definition will obscure the old one
+		]
+		oSymbolStkSetKind(syType)
 
-    % Most of this code is recycled from the original PT version,
-    % with the looping functionality removed.
-    sIdentifier
-	oSymbolStkPushLocalIdentifier
-	@TypeBody
-	[ oSymbolStkChooseKind
-	    | syUndefined:
-	    | syExternal:
-		% Program parameters must be declared as file variables
-		#eExternalDeclare
-		% Ignore this definition
-		oSymbolStkPop
-		oTypeStkPop
-		oTypeStkPop
-		>>
-	    | *:
-		#eMultiplyDefined
-		% The new definition will obscure the old one
-	]
-	oSymbolStkSetKind(syType)
-
-	% Create type table entries for the object as necessary.
-	% Where named types were used in the declaration, a type
-	% reference will be present, otherwise the type reference
-	% fields will be null.
-	oTypeStkSwap	% structure on top
-	[ oTypeStkChooseKind
-	    | tpArray:
-		oTypeStkSwap	% component on top
+		% Create type table entries for the object as necessary.
+		% Where named types were used in the declaration, a type
+		% reference will be present, otherwise the type reference
+		% fields will be null.
+		oTypeStkSwap	% structure on top
+		[ oTypeStkChooseKind
+		    | tpArray:
+			oTypeStkSwap	% component on top
+			[ oTypeStkChooseTypeReference
+			    | no:
+				% No type table entry exists,
+				% so create one.
+				oTypeTblEnter
+			    | *:
+			]
+			oTypeStkEnterComponentReference
+			oTypeStkSwap	% structure on top
+		    | *:
+		]
 		[ oTypeStkChooseTypeReference
 		    | no:
-			% No type table entry exists,
-			% so create one.
 			oTypeTblEnter
 		    | *:
 		]
-		oTypeStkEnterComponentReference
-		oTypeStkSwap	% structure on top
-	    | *:
-	]
-	[ oTypeStkChooseTypeReference
-	    | no:
-		oTypeTblEnter
-	    | *:
-	]
-	oSymbolStkEnterTypeReference
-	oSymbolTblEnter
-	oSymbolStkPop
-	oTypeStkPop
-	oTypeStkPop;
+		oSymbolStkEnterTypeReference
+		oSymbolTblEnter
+		oSymbolStkPop
+		oTypeStkPop
+		oTypeStkPop
+%%%%%%%%%%% CHANGED
+%	    | *:
+%		>
+%	]};
+%%%%%%%%%%% 
+	;
+%%%%%%%%%%% 
 
 TypeBody :
 	% Push a type stack entry for the structure type (e.g. array)
@@ -1234,126 +1367,156 @@ SubrangeUpperBound :
 	    | *:
 	];
 
-VariableDeclarations : % Accept declarations for multiple variables of a single type
-
-	sIdentifier
-	@VariablePushStack
-	oCountPush(one) %Keep track of the number of variables to allocate
-	{[
-	  | sVar : %Handle another variable
+VariableDeclarations :
+%%%%%%%%%%% CHANGED
+%	{[
+%	    | sIdentifier:
+%		@VariableAttributes
+%	    | *:
+%		>
+%	]};
+%%%%%%%%%%% 
+        % Handle Garnet multiple variable declaration
+        % Push all the declared identifiers on the Symbol Stack,
+        % use Count to keep track of how many
+        oCountPush(one)
+        sIdentifier
+        oSymbolStkPushLocalIdentifier
+        [ oSymbolStkChooseKind
+            | syUndefined, syExternal:
+            | *:
+                #eMultiplyDefined
+                % The new definition will obscure the old one
+        ]
+        {[
+            | sVar:
 		sIdentifier
-		@VariablePushStack
-		oCountIncrement 
-	  | * : %We have reached the type declaration
-        @VariableAttributes %Do the allocations here
-		>		
-	]};
-
-VariablePushStack :
-	oSymbolStkPushLocalIdentifier
-	[ oSymbolStkChooseKind
-	    | syUndefined, syExternal:
-	    | *:
-		#eMultiplyDefined
-		% The new definition will obscure the old one
-	];
+                oCountIncrement
+                oSymbolStkPushLocalIdentifier
+                [ oSymbolStkChooseKind
+                    | syUndefined, syExternal:
+                    | *:
+                        #eMultiplyDefined
+                        % The new definition will obscure the old one
+                ]
+            | *:
+                >
+        ]}
+        @VariableAttributes
+        oCountPop;
+%%%%%%%%%%% 
 
 VariableAttributes :
-	% Push the variable's structure and
-	% component types onto the type stack
-	@TypeBody
+%%%%%%%%%% DELETED
+%       oSymbolStkPushLocalIdentifier
+%       [ oSymbolStkChooseKind
+%           | syUndefined, syExternal:
+%           | *:
+%               #eMultiplyDefined
+%               % The new definition will obscure the old one
+%       ]
+%%%%%%%%%%
 
-    {[ oCountChoose
-        | zero :
-            >
-        | * : % There is another variable to handle
-            % Most of this code is recycled from the original PT version
-            oCountDecrement
-            [ oSymbolStkChooseKind
-                | syExternal:	% file parameter to program
-                oTypeStkSwap	% structure on top
+        % Push the variable's structure and
+        % component types onto the type stack
+        @TypeBody
+
+%%%%%%%%%% ADDED
+        % Now make that the type of each of the symbols we stacked
+        {[ oCountChoose
+            | zero:
+                >
+            | *:
+                oCountDecrement
+%%%%%%%%%%
+
+        [ oSymbolStkChooseKind
+            | syExternal:       % file parameter to program
+                oTypeStkSwap    % structure on top
                 [ oTypeStkChooseKind
                     | tpFile:
-                    oSymbolStkSetKind(syVariable)
-                    oTypeStkSwap	% component on top
-                    [ oTypeStkChooseTypeReference
-                        | no:	% no type table entry
-                        oTypeTblEnter
-                        | *:
-                    ]
-                    oTypeStkEnterComponentReference
-                    oTypeStkSwap	% structure on top
-                    [ oTypeStkChooseTypeReference
-                        | no:
-                        oTypeTblEnter
-                        | *:
-                    ]
-                    oSymbolStkEnterTypeReference
-                    % A symbol table entry was created for the file
-                    % when its program parameter was accepted.
-                    oSymbolTblUpdate
+                        oSymbolStkSetKind(syVariable)
+                        oTypeStkSwap    % component on top
+                        [ oTypeStkChooseTypeReference
+                            | no:       % no type table entry
+                                oTypeTblEnter
+                            | *:
+                        ]
+                        oTypeStkEnterComponentReference
+                        oTypeStkSwap    % structure on top
+                        [ oTypeStkChooseTypeReference
+                            | no:
+                                oTypeTblEnter
+                            | *:
+                        ]
+                        oSymbolStkEnterTypeReference
+                        % A symbol table entry was created for the file
+                        % when its program parameter was accepted.
+                        oSymbolTblUpdate
                     | *:
-                    #eExternalDeclare	% Ignore this declaration
+                        #eExternalDeclare       % Ignore this declaration
                 ]
-                | *:		% new variable or redeclaration in this scope
+            | *:                % new variable or redeclaration in this scope
                 oSymbolStkSetKind(syVariable)
-                oTypeStkSwap	% structure on top
-                [ oTypeStkChooseKind
-                    | tpFile:
-                    % an internal file
-                    oSymbolStkSetKind(syVariable)
-                    oTypeStkSwap	% component on top
-                    [ oTypeStkChooseTypeReference
-                        | no:	% no type table entry
-                        oTypeTblEnter
-                        | *:
-                    ]
-                    oTypeStkEnterComponentReference
-                    oTypeStkSwap	% structure on top
-                    [ oTypeStkChooseTypeReference
-                        | no:
-                        oTypeTblEnter
-                        | *:
-                    ]
-                    oSymbolStkEnterTypeReference
-                    oValuePush(zero)
-                    @AllocateVar
-                    oValuePop
-                    | *:
-                    @AllocateVar
-                ]
+                oTypeStkSwap    % structure on top
+		[ oTypeStkChooseKind
+		    | tpFile:
+			% an internal file
+			oSymbolStkSetKind(syVariable)
+			oTypeStkSwap	% component on top
+			[ oTypeStkChooseTypeReference
+			    | no:	% no type table entry
+				oTypeTblEnter
+			    | *:
+			]
+			oTypeStkEnterComponentReference
+			oTypeStkSwap	% structure on top
+			[ oTypeStkChooseTypeReference
+			    | no:
+				oTypeTblEnter
+			    | *:
+			]
+			oSymbolStkEnterTypeReference
+			oValuePush(zero)
+			@AllocateVar
+			oValuePop
+		    | *:
+			@AllocateVar
+		]
 
                 % Create type table entries for the object as necessary.
                 % Where named types were used in the declaration, a type
                 % reference will be present, otherwise the type reference
                 % fields will be null.
                 [ oTypeStkChooseKind
-                    | tpArray, tpFile:
-                    oTypeStkSwap	% component on top
-                    [ oTypeStkChooseTypeReference
-                        | no:	% no type table entry
-                        oTypeTblEnter
-                        | *:
-                    ]
-                    oTypeStkEnterComponentReference
-                    oTypeStkSwap	% structure on top
+                    | tpArray, tpPackedArray, tpFile:
+                        oTypeStkSwap    % component on top
+                        [ oTypeStkChooseTypeReference
+                            | no:       % no type table entry
+                                oTypeTblEnter
+                            | *:
+                        ]
+                        oTypeStkEnterComponentReference
+                        oTypeStkSwap    % structure on top
                     | *:
                 ]
                 [ oTypeStkChooseTypeReference
                     | no:
-                    oTypeTblEnter
+                        oTypeTblEnter
                     | *:
                 ]
                 oSymbolStkEnterTypeReference
                 oSymbolTblEnter
-            ]
-            oTypeStkSwap
-            oSymbolStkPop
-    ]}
-    oCountPop %Remove our counter
-	oTypeStkPop
-	oTypeStkPop;
+        ]
+        oSymbolStkPop
 
+%%%%%%%%%% ADDED
+        oTypeStkSwap    % back to normal order for next variable
+        ]}
+%%%%%%%%%%
+
+        oTypeStkPop
+        oTypeStkPop;
 
 AllocateVar :
 	% A symbol stack entry and type stack entries for both
@@ -1369,11 +1532,11 @@ AllocateVar :
 		oAllocateVarParameter
 	    | *:
 		[ oTypeStkChooseKind
-		    | tpInteger, tpSubrange, tpString:
+		    | tpInteger, tpSubrange:
 			oAllocateAlignOnWord
 			oSymbolStkEnterDataAddress
 			oAllocateVariable
-		    | tpBoolean:
+		    | tpString, tpBoolean:		%%%%%%%%%%% CHANGED
 			oSymbolStkEnterDataAddress
 			oAllocateVariable
 		    | tpArray:
@@ -1413,40 +1576,30 @@ AllocateVar :
 	];
 
 ProcedureDefinition :
-		sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
-        % The sPublic token precedes the procedure name, so we must create a case for each.
-	[
-	    | sPublic: %This is a public procedure, so set the kind accordingly.
-		[ oSymbolStkChooseKind
-		    | syUndefined:
-		    | syExternal:
-			% Program parameters must be declared as file variables
-			#eExternalDeclare
-		    | *:
-			#eMultiplyDefined
-			% New definition obscures old one.
-		]
-		.tSkipProc	% Branch around the procedure definition
-		oFixPushForwardBranch
-		oEmitNullAddress
-		% If procedure is public, set its type to public
-		oSymbolStkSetKind(syPublicProcedure)
-	    | * : % This is a normal procedure
-		[ oSymbolStkChooseKind
-		    | syUndefined:
-		    | syExternal:
-			% Program parameters must be declared as file variables
-			#eExternalDeclare
-		    | *:
-			#eMultiplyDefined
-			% New definition obscures old one.
-		]
-		.tSkipProc	% Branch around the procedure definition
-		oFixPushForwardBranch
-		oEmitNullAddress
-		% Else do regular procedure
-		oSymbolStkSetKind(syProcedure)
+	sIdentifier  oSymbolStkPushLocalIdentifier	% procedure name
+	[ oSymbolStkChooseKind
+	    | syUndefined:
+	    | syExternal:
+		% Program parameters must be declared as file variables
+		#eExternalDeclare
+	    | *:
+		#eMultiplyDefined
+		% New definition obscures old one.
 	]
+%%%%%%%%%%% ADDED 
+        [
+            | sPublic:
+                oSymbolStkSetKind(syPublicProcedure)
+            | *:
+                oSymbolStkSetKind(syProcedure)
+        ]
+%%%%%%%%%%% 
+	.tSkipProc	% Branch around the procedure definition
+	oFixPushForwardBranch
+	oEmitNullAddress
+%%%%%%%%%%% DELETED
+%	oSymbolStkSetKind(syProcedure)
+%%%%%%%%%%% 
 	oSymbolStkEnterCodeAddress
 	oTypeStkPush(tpNull)
 	oTypeStkSetRecursionFlag(yes)
@@ -1455,7 +1608,30 @@ ProcedureDefinition :
 	oSymbolTblEnter
 	oSymbolTblPushScope	% procedure scope
 	@ProcedureHeading
-	@Block
+
+%%%%%%%%%%% CHANGED 858
+%	@Block
+%%%%%%%%%%%
+        % If there is a return type, it is a function 
+	[
+	    | sIdentifier:
+		[ oSymbolStkChooseKind		% of this procedure 
+		    | syProcedure:
+			oSymbolStkSetKind(syFunction)
+		    | syPublicProcedure:
+			oSymbolStkSetKind(syPublicFunction)
+		]
+		% Process the return type identifier we just accepted
+		@FunctionReturnType
+		@Block
+		% Every function ends with a return statement
+	        sReturn
+		@FunctionReturnValue
+	    | *:
+		@Block
+	]
+%%%%%%%%%%% 
+
 	.tProcedureEnd
 	oFixPopForwardBranch	% fix skip around procedure
 	oSymbolTblUpdate
@@ -1542,6 +1718,74 @@ ProcedureParameterType :
 	% No type table entry is needed since the type
 	% must have been specified by named type.
 
+%%%%%%%%%%% ADDED 858
+FunctionReturnType :
+        % The symbol stack entry for the function is on top of the symbol stack.
+        % The type stack entry for the function is on top of the type stack.
+        % Process the return type of the function and fill it in to the function's type.
+
+        % The function's return type identifier has just been accepted
+        oSymbolStkPushIdentifier        % function return type name
+        [ oSymbolStkChooseKind
+            |syType:
+            |*:
+                #eTypeIdentifierReqd
+                oSymbolStkPop
+                @SymbolStkPushIntegerType
+        ]
+        oTypeStkPushSymbol              % return type
+        oSymbolStkPop                   % return type name
+
+        % Record the return type in the type entry for the function
+        [ oTypeStkChooseKind
+            |tpInteger:
+                oTypeStkPop             % return type
+                oTypeStkSetKind(tpInteger)
+            |tpBoolean:
+                oTypeStkPop             % return type
+                oTypeStkSetKind(tpBoolean)
+            |tpString:
+                oTypeStkPop             % return type
+                oTypeStkSetKind(tpString)
+            |*:
+                #eIllegalFunctionType
+                oTypeStkPop             % return type
+                oTypeStkSetKind(tpInteger)
+        ]
+        oTypeTblUpdate;
+
+FunctionReturnValue :
+        % Accept the result expression and check that its type is right 
+	.tFunctionResult
+        @Expression
+	oSymbolStkPop			% expression
+        [ oTypeStkChooseKind
+            |tpInteger:
+                oTypeStkPop 
+		[ oTypeStkChooseKind	% result type
+		    | tpInteger:
+		    | *:
+			#eTypeMismatch
+		]
+            |tpBoolean:
+                oTypeStkPop 
+		[ oTypeStkChooseKind	% result type
+		    | tpBoolean:
+		    | *:
+			#eTypeMismatch
+		]
+            |tpString:
+                oTypeStkPop 
+		[ oTypeStkChooseKind	% result type
+		    | tpString:
+		    | *:
+			#eTypeMismatch
+		]
+            |*:
+                #eTypeMismatch
+                oTypeStkPop             
+	];
+%%%%%%%%%%% 
 
 ProcedurePrologue :
 	% Now all the formal parameter symbols are stacked on top of the
@@ -1567,8 +1811,8 @@ ProcedurePrologue :
 			[ oTypeStkChooseKind
 			    | tpInteger, tpSubrange:
 				.tStoreParmInteger
-			    | tpString:
-				.tStoreParmString
+			    | tpString: 		%%%%%%%%%%% CHANGED
+				.tStoreParmString 	%%%%%%%%%%% CHANGED
 			    | tpBoolean:
 				.tStoreParmBoolean
 			]
@@ -1582,15 +1826,6 @@ ProcedurePrologue :
 	]}
 	oTypeStkEnterParameterCount	% In procedure's type entry
 	oCountPop;
-
-ModuleDeclarations :
-	sIdentifier oSymbolStkPushIdentifier % Module identifier doesn't need any other identification 
-	oSymbolTblEnter
-	oSymbolStkPop % Enter module name into symbol table and pop from stack
-	oSymbolTblPushScope % Create scope for module
-	@Block
-	oSymbolTblStripScope
-	oSymbolTblMergeScope; % Strip and merge scope, retaining public procedures
 
 Statement :
 	[
@@ -1606,8 +1841,12 @@ Statement :
 		@WhileStmt
 	    | sCaseStmt:
 		@CaseStmt
+%%%%%%%%%%% CHANGED
+%	    | sRepeatStmt:
+%%%%%%%%%%% 
 	    | sDoStmt:
 		@DoStmt
+%%%%%%%%%%% 
 	    | sNullStmt:
 	];
 
@@ -1636,8 +1875,8 @@ AssignmentStmt :
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange, tpFile:
 		.tAssignInteger
-	    | tpString:
-		.tAssignString
+	    | tpString: 		%%%%%%%%%%% CHANGED
+		.tAssignString 		%%%%%%%%%%% CHANGED
 	    | tpBoolean:
 		.tAssignBoolean
 	    | *:		% error flagged above
@@ -1661,7 +1900,7 @@ CallStmt :
 	    | *:
 	]
 	[ oSymbolStkChooseKind
-	    | syProcedure,syPublicProcedure: % Public procedures are also callable
+	    | syProcedure, syPublicProcedure: 		%%%%%%%%%%% CHANGED
 		[ oSymbolStkChooseStandardRoutine
 		    | rtReset:
 			.tTrapBegin
@@ -1773,7 +2012,7 @@ VariableActual :
 			#eParameterTypeMismatch
 		]
 		[ oTypeStkChooseKind
-		    | tpInteger, tpSubrange, tpString, tpBoolean:
+		    | tpInteger, tpSubrange, tpString, tpBoolean: 	%%%%%%%%%%% CHANGED
 			% Subscripted packed array variables are
 			% illegal as variable actual parameters
 			[ oTypeStkChoosePackedComponentFlag
@@ -1819,62 +2058,81 @@ IfStmt :
 	oFixPopForwardBranch;
 
 WhileStmt :
-	.tWhileBegin
-	oFixPushTargetAddress		% top-of-loop branch target
-	@BooleanControlExpression
-	.tWhileTest
-	oFixPushForwardBranch
-	oEmitNullAddress		% exit branch
-	oFixSwap		% top-of-loop target back on top
-	@Statement
-	.tWhileEnd
-	oFixPopTargetAddress
-	oFixPopForwardBranch;
-
+  	.tWhileBegin
+  	oFixPushTargetAddress		% top-of-loop branch target
+  	@BooleanControlExpression
+  	.tWhileTest
+  	oFixPushForwardBranch
+  	oEmitNullAddress		% exit branch
+  	oFixSwap			% top-of-loop target back on top
+  	@Statement
+  	.tWhileEnd
+  	oFixPopTargetAddress
+  	oFixPopForwardBranch;
+ 
+%%%%%%%%%%% CHANGED
+% RepeatStmt :
+% 	.tRepeatBegin
+% 	oFixPushTargetAddress		% top-of-loop branch target
+% 	{[
+% 	    | sRepeatEnd:
+% 		>
+% 	    | *:
+% 		@Statement
+% 	]}
+% 	.tRepeatControl
+% 	@BooleanControlExpression
+% 	.tRepeatTest
+% 	oFixPopTargetAddress;
+%%%%%%%%%%% 
 DoStmt :
-    %Removed RepeatStmt, changed DoStmt to operate like while stmt
 	.tDoBegin
 	oFixPushTargetAddress		% top-of-loop branch target
-    %Allow statement sequence before break if
-    @Statement
-    sBreakIf
-    .tDoBreakIf
+	@Statement
+	sBreakIf .tDoBreakIf
 	@BooleanControlExpression
-    %T-codes are different from previous
 	.tDoTest
 	oFixPushForwardBranch
 	oEmitNullAddress		% exit branch
-	oFixSwap		% top-of-loop target back on top
-    @Statement
-    .tDoEnd
+	oFixSwap			% top-of-loop target back on top
+	@Statement
+	.tDoEnd
 	oFixPopTargetAddress
-    oFixPopForwardBranch;
+	oFixPopForwardBranch;
+%%%%%%%%%%% 
 
 CaseStmt :
 	.tCaseBegin
 	@CaseSelectorExpression
 	oCasePushDisplay		% handle nested case statements
-	oCountPush (zero)	% count case alternative statements
+	oCountPush (zero)		% count case alternative statements
 	.tCaseSelect
 	oFixPushForwardBranch
 	oEmitNullAddress		% address of case branch table
 	{[
-	    | sInteger:
+%%%%%%%%%%% ADDED
+	    | sElse:
+		.tCaseEnd
+		oFixPopForwardBranch
+		oEmitCaseBranchTable
+		@CaseElse
+		sCaseEnd
+		>
+%%%%%%%%%%% 
+	    | sCaseEnd:
+%%%%%%%%%%% ADDED
+		.tCaseEnd
+		oFixPopForwardBranch
+		oEmitCaseBranchTable
+%%%%%%%%%%% 
+		>
+	    | *:
 		@CaseAlternative
-        | *:
-            >
 	]}
-	.tCaseEnd
-	oFixPopForwardBranch
-	oEmitCaseBranchTable
-    %in case of optional else statement after tCaseEnd, run ElseCase
-    [
-        | sElse:
-        .tCaseElse
-        @ElseCase
-        | *:
-    ]
-    sCaseEnd
+%%%%%%%%%%% DELETED
+%	oFixPopForwardBranch
+%	oEmitCaseBranchTable
+%%%%%%%%%%% 
 	% emit merge branches for case alternatives
 	{[ oCountChoose		% number of case alternatives
 	    | zero:
@@ -1946,13 +2204,18 @@ CaseAlternative :
 	oFixSwap			% keep case select branch on top
 	oCountIncrement;
 
-ElseCase:
-    %ElseCase allows a statement, no case select.  
+%%%%%%%%%%% ADDED
+CaseElse:
+	% A case else clause acts like an alternative for all other values
+	.tCaseElse
 	@Statement
 	.tCaseMerge
 	oFixPushForwardBranch
-	oEmitNullAddress		% merge branch at end of statements
+	oEmitNullAddress		% merge branch at end of statement
+	oFixSwap			% keep case select branch on top
 	oCountIncrement;
+%%%%%%%%%%% 
+
 
 Expression :
 	% Expressions have been converted to postfix form by the
@@ -1963,7 +2226,9 @@ Expression :
 	    @Operand
 	    @UnaryOperator
 	    @BinaryOperator
+%%%%%%%%%%% ADDED 
 	    @TernaryOperator
+%%%%%%%%%%% 
 	    [
 		| sExpnEnd:
 		    >
@@ -1989,8 +2254,13 @@ Operand :
 		    | syVariable, syVarParameter:
 			@Variable
 			@VariableOperand
-		    | syFunction:
+%%%%%%%%%%% CHANGED 858
+%		    | syFunction: 
+%			@FunctionOperand
+%%%%%%%%%%% 
+		    | syFunction, syPublicFunction:
 			@FunctionOperand
+%%%%%%%%%%% 
 		    | *:
 			#eExpnOperandReqd
 			oSymbolStkPop
@@ -2005,28 +2275,51 @@ Operand :
 		oEmitValue
 		oValuePop
 	    | sLiteral:
-	    % handle strings as first-class values rather than char arrays
-		oValuePushStringLength
-		[ oValueChoose
-		    | zero:
-			#eNullString
-			oSymbolStkPush(syExpression)
-			oTypeStkPush(tpString)
-		    | one:
-			oSymbolStkPush(syExpression)
-			oTypeStkPush(tpString)
-			.tLiteralString
-			oEmitString
-		    | *:
-			oSymbolStkPush(syExpression)
-            % Emit literal string length followed by value
-			.tLiteralString
-			oEmitValue	% string length
-			oEmitString
-			oTypeStkPush(tpString)
-			oTypeStkLinkToStandardComponentType(stdString)
-		]
-		oValuePop
+%%%%%%%%%%% CHANGED
+%		oValuePush(one)	% implicit lower bound of string index type
+%		oValuePushStringLength
+%		[ oValueChoose
+%		    | zero:
+%			#eNullString
+%			oSymbolStkPush(syExpression)
+%			oTypeStkPush(tpChar)
+%		    | one:
+%			oSymbolStkPush(syExpression)
+%			oTypeStkPush(tpChar)
+%			.tLiteralChar
+%			oEmitString
+%		    | *:
+%			oSymbolStkPush(syExpression)
+%			% branch around string since
+%			% it is stored in the code area
+%			.tSkipString
+%			oFixPushForwardBranch
+%			oEmitNullAddress
+%			.tLiteralString
+%			oEmitValue	% string length
+%			oFixPushTargetAddress
+%			oFixSwap		% Forward branch back on top
+%			oEmitString
+%			oFixPopForwardBranch
+%			% Descriptor points to the
+%			% first character of the string
+%			.tStringDescriptor
+%			oFixPopTargetAddress
+%			oTypeStkPush(tpPackedArray)
+%			oTypeStkEnterBounds
+%			oTypeStkLinkToStandardComponentType(stdChar)
+%		]
+%		oValuePop
+%		oValuePop
+%%%%%%%%%%% 
+                oSymbolStkPush(syExpression)
+                oTypeStkPush(tpString)
+                .tLiteralString
+                oValuePushStringLength
+                oEmitValue
+                oValuePop
+                oEmitString
+%%%%%%%%%%% 
 	    | sFile:
 		@Expression
 		@FileOperand
@@ -2041,13 +2334,17 @@ UnaryOperator :
 	    | sNot:
 		.tNot
 		oTypeStkPush(tpBoolean)
-		| sLength:
-		% handle string length unary operation and the corresponding type checks
-		.tLength
-		oTypeStkPush(tpInteger)	% result type
-		oSymbolStkSetKind(syExpression)
-		@SwapAndCheckStringAndPop   % operand must be a string
-		>>		% bypass generalized type check
+%%%%%%%%%%% ADDED 
+            | sLength:
+                .tLength
+                [ oTypeStkChooseKind
+                    | tpString:
+                        oTypeStkSetKind(tpInteger)      % fake for check
+                    | *:
+                        #eTypeMismatch
+                ]
+                oTypeStkPush(tpInteger)
+%%%%%%%%%%% 
 	    | *:
 		>>		% bypass type check
 	]
@@ -2061,19 +2358,23 @@ BinaryOperator :
 	% Could make this a cycle (comment applies to UnaryOperator as well)
 	% but that would probably be less efficient on average.
 	[
-	    | sAdd: % handle string concatenation if the top of the type stack is a string
-	    [ oTypeStkChooseKind
-            | tpInteger:
-            .tAdd
-            oTypeStkPush(tpInteger)	% result type
-            @CompareOperandAndResultTypes
-            | tpString:
-            .tConcatenate
-            oTypeStkPush(tpString) % result type
-            @CompareOperandAndResultTypes
-            | *:
-            #eTypeMismatch
-	    ]
+%%%%%%%%%%% CHANGED
+%	    | sAdd:
+%		.tAdd
+%		oTypeStkPush(tpInteger)	% result type
+%		@CompareOperandAndResultTypes
+%%%%%%%%%%% 
+	    | sAdd:
+                [ oTypeStkChooseKind
+                    | tpString:
+                        .tConcatenate
+                        oTypeStkPush(tpString)  % concat result type
+                    | *:
+                        .tAdd
+                        oTypeStkPush(tpInteger) % addition result type
+                ]
+		@CompareOperandAndResultTypes
+%%%%%%%%%%% 
 	    | sSubtract:
 		.tSubtract
 		oTypeStkPush(tpInteger)
@@ -2090,23 +2391,32 @@ BinaryOperator :
 		.tOr
 		oTypeStkPush(tpBoolean)
 		@CompareOperandAndResultTypes
+%%%%%%%%%%% CHANGED
+%	    | sEq:
+%		.tEq
+%		@CompareRelationalOperandTypes
+%	    | sNE:
+%		.tNE
+%		@CompareRelationalOperandTypes
+%%%%%%%%%%% 
 	    | sEq:
-		[ oTypeStkChooseKind
-		    | tpString: % handle string equality if the top of the type stack is a string
-		    @CheckStringEqualityTypes
-		    | *:
-		    .tEq
-		    @CompareRelationalOperandTypes
-		]
+                [ oTypeStkChooseKind
+                    | tpString:
+                        .tStringEqual
+                    | *:
+                        .tEq
+                ]
+                @CompareEqualityRelationalOperandTypes
 	    | sNE:
-	    [ oTypeStkChooseKind
-            | tpString: % handle string inequality if the top of the type stack is a string
-            @CheckStringEqualityTypes
-            .tNot
-            | *:
-            .tNE
-            @CompareRelationalOperandTypes
-        ]
+                [ oTypeStkChooseKind
+                    | tpString:
+                        .tStringEqual
+                        .tNot
+                    | *:
+                        .tNE
+                ]
+                @CompareEqualityRelationalOperandTypes
+%%%%%%%%%%% 
 	    | sGT:
 		.tGT
 		@CompareRelationalOperandTypes
@@ -2131,58 +2441,50 @@ BinaryOperator :
 		.tModulus
 		oTypeStkPush(tpInteger)
 		@CompareOperandAndResultTypes
-		| sIndex:
-		% handle the string index binary operation
+%%%%%%%%%%% ADDED 
+	    | sIndex:
 		.tIndex
-		oTypeStkPush(tpInteger) % result type
-		@SwapAndCheckStringAndPop   % second operand must be a string
-		@SwapAndCheckStringAndPop   % first operand must be a string
-		% only result type remains
-        oSymbolStkPop
-        oSymbolStkSetKind(syExpression)
+		oTypeStkPush(tpString)
+		@CompareOperandAndResultTypes
+		oTypeStkPop
+		oTypeStkPush(tpInteger)
+%%%%%%%%%%% 
 	    | *:
 	];
 
-TernaryOperator :
-    % Handle the string substring ternary operation.
-    % The appropriate number of symbols must be popped at the end.
-	[
-	    | sSubstring:
-	    .tSubstring
-	    oTypeStkPush(tpString)      % result type
-	    @SwapAndCheckIntegerAndPop  % third operand must be an integer
-	    @SwapAndCheckIntegerAndPop  % second operand must be an integer
-	    @SwapAndCheckStringAndPop   % first operand must be a string
-	    % only result type remains
-        oSymbolStkPop
-        oSymbolStkPop
-        oSymbolStkSetKind(syExpression)
-	    | *:
-	];
-
-SwapAndCheckIntegerAndPop :
-    % Swap the top of the type stack (the result type) with the entry
-    % below it (the operand type being checked). Ensure that the operand
-    % is an integer.
-    oTypeStkSwap
-    [ oTypeStkChooseKind
-        | tpInteger:
-        | *:
-        #eTypeMismatch
-    ]
-    oTypeStkPop;
-
-SwapAndCheckStringAndPop :
-    % Swap the top of the type stack (the result type) with the entry
-    % below it (the operand type being checked). Ensure that the operand
-    % is a string.
-    oTypeStkSwap
-    [ oTypeStkChooseKind
-        | tpString:
-        | *:
-        #eTypeMismatch
-    ]
-    oTypeStkPop;
+%%%%%%%%%%% ADDED 
+TernaryOperator:
+        [
+            | sSubstring:
+                % Last operand is end index
+                [ oTypeStkChooseKind
+                    | tpInteger:
+                    | *:
+                        #eTypeMismatch
+                ]
+                oTypeStkPop
+                oSymbolStkPop
+                % Second operand is start index
+                [ oTypeStkChooseKind
+                    | tpInteger:
+                    | *:
+                        #eTypeMismatch
+                ]
+                oTypeStkPop
+                oSymbolStkPop
+                % First operand is the string itself
+                [ oTypeStkChooseKind
+                    | tpString:
+                    | *:
+                        #eTypeMismatch
+                ]
+                oTypeStkPop
+                % Result type is string
+                oTypeStkPush(tpString)
+                .tSubstring
+            | *:
+        ];
+%%%%%%%%%%% 
 
 CompareAndSwapTypes :
 	% Compare the top two type stack entries for assignment
@@ -2198,10 +2500,10 @@ CompareAndSwapTypes :
 		    | *:
 			#eTypeMismatch
 		]
-	    | tpString:
+	    | tpString:			%%%%%%%%%%% CHANGED
 		oTypeStkSwap
 		[ oTypeStkChooseKind
-		    | tpString:
+		    | tpString:		%%%%%%%%%%% CHANGED
 		    | *:
 			#eTypeMismatch
 		]
@@ -2247,31 +2549,12 @@ CompareOperandAndResultTypes :
 	oSymbolStkPop
 	oSymbolStkSetKind(syExpression);
 
-CheckStringEqualityTypes :
-    % Used to handle the string "equals" operator as well as the
-    % "not equals" operator (by negating the operation afterward).
-    .tStringEqual
-    oTypeStkPop
-    [ oTypeStkChooseKind
-        | tpString:
-        | *:
-        #eOperandOperatorTypeMismatch
-    ]
-    oTypeStkPop
-    oTypeStkPush(tpBoolean)
-    oSymbolStkPop
-    oSymbolStkSetKind(syExpression);
-
 CompareRelationalOperandTypes :
 	% Verify that the types of the two operands are assignment
 	% compatible and that they are valid relational expression
-	% operand types.  Pop the operand symbol and type stack
-	% entries and push result symbol and type stack entries.
-	% Note that chars/strings are no longer valid, as they are
-	% no longer comparable except for equality, which is
-	% handled by the CheckStringEqualityTypes rule.
-	% (integer or subrange only -- chars/strings
-    	% are no longer comparable except for equality)
+	% operand types (char, integer or subrange).  Pop the
+	% operand symbol and type stack entries and push result
+	% symbol and type stack entries.
 
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange:
@@ -2281,6 +2564,15 @@ CompareRelationalOperandTypes :
 		    | *:
 			#eOperandOperatorTypeMismatch
 		]
+%%%%%%%%%%% DELETED
+%	    | tpChar:
+%		oTypeStkPop
+%		[ oTypeStkChooseKind
+%		    | tpChar:
+%		    | *:
+%			#eOperandOperatorTypeMismatch
+%		]
+%%%%%%%%%%% 
 	    | *:
 		#eOperandOperatorTypeMismatch
 		oTypeStkPop
@@ -2290,6 +2582,38 @@ CompareRelationalOperandTypes :
 	oSymbolStkPop
 	oSymbolStkSetKind(syExpression);
 
+%%%%%%%%%%% ADDED 
+CompareEqualityRelationalOperandTypes:
+        % Verify that the types of the two operands are assignment
+        % compatible and that they are valid relational expression
+        % operand types (char, integer or subrange).  Pop the
+        % operand symbol and type stack entries and push result
+        % symbol and type stack entries.
+
+        [ oTypeStkChooseKind
+            | tpInteger, tpSubrange:
+                oTypeStkPop
+                [ oTypeStkChooseKind
+                    | tpInteger, tpSubrange:
+                    | *:
+                        #eOperandOperatorTypeMismatch
+                ]
+            | tpString:
+                oTypeStkPop
+                [ oTypeStkChooseKind
+                    | tpString:
+                    | *:
+                        #eOperandOperatorTypeMismatch
+                ]
+            | *:
+                #eOperandOperatorTypeMismatch
+                oTypeStkPop
+        ]
+        oTypeStkPop
+        oTypeStkPush(tpBoolean)
+        oSymbolStkPop
+        oSymbolStkSetKind(syExpression);
+%%%%%%%%%%% 
 
 Variable :
 	% Emit code to place the address of a variable on the runtime
@@ -2352,14 +2676,14 @@ VariableExtension :
 		[ oTypeStkChooseKind
 		    | tpInteger, tpSubrange:
 			.tSubscriptInteger
-		    | tpString:
-			.tSubscriptString
+		    | tpString: 		%%%%%%%%%%% CHANGED
+			.tSubscriptString 	%%%%%%%%%%% CHANGED
 		    | tpBoolean:
 			.tSubscriptBoolean
 		]
 	    | *:
 		[ oTypeStkChooseKind
-		    | tpInteger, tpSubrange, tpString, tpBoolean:
+		    | tpInteger, tpSubrange, tpString, tpBoolean: 	%%%%%%%%%%% CHANGED
 			oTypeStkSetPackedComponentFlag(no)
 		    | *:
 		]
@@ -2372,12 +2696,27 @@ ConstantOperand :
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange:
 		.tLiteralInteger
+	    | tpString: 		%%%%%%%%%%% CHANGED
+		.tLiteralString 	%%%%%%%%%%% CHANGED
 	    | tpBoolean:
 		.tLiteralBoolean
+%%%%%%%%%%% DELETED
+%	    | tpPackedArray:	% always a literal string
+%		.tStringDescriptor
+%%%%%%%%%%% 
 	]
 	oValuePushSymbol
 	oEmitValue
-	oValuePop;
+%%%%%%%%%%% CHANGED
+%	oValuePop;
+%%%%%%%%%%% 
+	oValuePop
+        [ oTypeStkChooseKind
+	    | tpString:
+		.tFetchString
+	    | *:
+	];
+%%%%%%%%%%% 
 
 VariableOperand :
 	% The Variable rule has placed the address of the variable on the
@@ -2387,8 +2726,8 @@ VariableOperand :
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange, tpFile:
 		.tFetchInteger		% replace address with value
-	    | tpString:
-		.tFetchString
+	    | tpString:			%%%%%%%%%%% CHANGED
+		.tFetchString 		%%%%%%%%%%% CHANGED
 	    | tpBoolean:
 		.tFetchBoolean
 	    % The caller is responsible for detecting illegal situations
@@ -2423,15 +2762,15 @@ FunctionOperand :
 		oSymbolStkPop	% Chr symbol
 		oTypeStkPop
 		oSymbolStkPush(syExpression)
-		oTypeStkPush(tpString)
+		oTypeStkPush(tpString) 			%%%%%%%%%%% CHANGED
 	    | rtOrd:
 		[
 		    | sParmBegin:
 			@Expression
 			[ oTypeStkChooseKind
-			    | tpString:
+			    | tpString: 		%%%%%%%%%%% CHANGED
 			    | *:
-				#eStringExpnReqd
+				#eStringExpnReqd 	%%%%%%%%%%% CHANGED
 			]
 			sParmEnd
 			oSymbolStkPop	% Parameter expression
@@ -2450,6 +2789,29 @@ FunctionOperand :
 	    | rtEOF:
 		@StandardFunctionActual
 		.tEOF
+%%%%%%%%%%% ADDED 858
+	    | *:
+                .tCallBegin
+		[
+		    | sParmBegin:
+			@ActualParameters
+		    | *:
+			oCountPush(zero)
+			[ oTypeStkCompareParameterCount
+			    | yes:      
+				% function takes zero parameters
+			    | *:
+				#eInsufficientActuals
+			]
+			oCountPop
+		]
+                .tCallEnd
+                oValuePushSymbol                % emit the function code address
+                oEmitValue
+                oValuePop
+                oSymbolStkPop                   % function name
+                oSymbolStkPush(syExpression)
+%%%%%%%%%%% 
 	];
 
 StandardFunctionActual :
@@ -2607,20 +2969,68 @@ AssignProcedure :
 		    | sParmEnd:
 			#eFileNameReqd
 		    | *:
-			@Expression
-			[ oTypeStkChooseKind
-			    | tpString:                 % must be a string
-			    oValuePushStringLength
-			    .tLiteralString
-                oEmitValue      % string length
-                oEmitString     % string value
-			    oValuePop
-				sParmEnd
+                        @Expression
+%%%%%%%%%% CHANGED 
+%                        [ oTypeStkChooseKind
+%                            | tpArray:
+%                                .tSubscriptBegin
+%                                .tLiteralInteger
+%                                oValuePush(one)
+%                                oEmitValue
+%                                oValuePop
+%                                .tSubscriptChar
+%                                .tVarParm
+%                            | *:
+%                        ]
+%                        [ oTypeStkChooseKind
+%                            | tpArray, tpPackedArray:   % must be a char array or literal string
+%                                oTypeStkPushComponent
+%                                [ oTypeStkChooseKind
+%                                    | tpChar:
+%                                    | *:
+%                                        #eFileNameReqd
+%                                ]
+%                                oTypeStkPop     % component type
+%                                oValuePushTypeStkLowerBound
+%                                [ oValueChoose
+%                                    | one:
+%                                    | *:        % string has lower bound one
+%                                        #eFileNameReqd
+%                                ]
+%                                oValuePop
+%                                .tParmEnd
+%                                % need length of string as well
+%                                .tLiteralInteger
+%                                oValuePushTypeStkUpperBound
+%                                [ oTypeStkChooseKind
+%                                    | tpPackedArray:    % a literal string
+%                                        oValueNegate    % mark as code segment
+%                                    | tpArray:
+%                                ]
+%                                oEmitValue
+%                                oValuePop
+%                                .tParmEnd
+%                                sParmEnd
+%                            | *:
+%                                #eFileNameReqd
+%                                @FlushActuals
+%                        ]
+%%%%%%%%%% 
+                         [ oTypeStkChooseKind
+			    | tpString:
 				.tParmEnd
+				% need length of string as well
+				.tLiteralInteger
+				oValuePush(stringSize)
+				oEmitValue
+				oValuePop
+				.tParmEnd
+				sParmEnd
 			    | *:
 				#eFileNameReqd
 				@FlushActuals
 			]
+%%%%%%%%%% 
 			oSymbolStkPop
 			oTypeStkPop
 		]
@@ -2655,7 +3065,7 @@ WriteProcedure :
 				oTypeStkPushComponent
 				oValuePushSymbol	% file descriptor
 				[ oTypeStkChooseKind
-				    | tpString:
+				    | tpString: 		%%%%%%%%%%% CHANGED
 					{
 					    .tTrapBegin
 					    .tLiteralAddress
@@ -2668,8 +3078,21 @@ WriteProcedure :
 					    .tVarParm
 					    .tParmEnd
 					    @Expression
+%%%%%%%%%% DELETED
+%					    [ oTypeStkChooseKind
+%						| tpArray:
+%						    .tSubscriptBegin
+%						    .tLiteralInteger
+%						    oValuePush(one)
+%						    oEmitValue
+%						    oValuePop
+%						    .tSubscriptChar
+%						    .tVarParm
+%						| *:
+%					    ]
+%%%%%%%%%%
 					    .tParmEnd
-					    @WriteString
+					    @WriteString	%%%%%%%%%% CHANGED
 					    [
 						| sParmEnd:
 						    >
@@ -2690,7 +3113,7 @@ WriteProcedure :
 					    .tParmEnd
 					    @Expression
 					    .tParmEnd
-					    @WriteNonString
+					    @WriteNonString	%%%%%%%%%% CHANGED
 					    [
 						| sParmEnd:
 						    >
@@ -2748,19 +3171,21 @@ WriteProcedure :
 				oTypeStkPushSymbol
 			]
 			@Expression
-			[ oTypeStkChooseKind
-			    | tpArray:
-				.tSubscriptBegin
-				.tLiteralInteger
-				oValuePush(one)
-				oEmitValue
-				oValuePop
-				.tSubscriptString
-				.tVarParm
-			    | *:
-			]
+%%%%%%%%%% DELETED
+%			[ oTypeStkChooseKind
+%			    | tpArray:
+%				.tSubscriptBegin
+%				.tLiteralInteger
+%				oValuePush(one)
+%				oEmitValue
+%				oValuePop
+%				.tSubscriptChar
+%				.tVarParm
+%			    | *:
+%			]
+%%%%%%%%%%
 			.tParmEnd
-			@WriteString
+			@WriteString			%%%%%%%%%% CHANGED
 			@WriteStandardExpnList
 		]
 	    | sParmEnd:
@@ -2790,23 +3215,25 @@ WriteStandardExpnList :
 		.tVarParm
 		.tParmEnd
 		@Expression
-		[ oTypeStkChooseKind
-		    | tpArray:
-			.tSubscriptBegin
-			.tLiteralInteger
-			oValuePush(one)
-			oEmitValue
-			oValuePop
-			.tSubscriptString
-			.tVarParm
-		    | *:
-		]
+%%%%%%%%%% DELETED
+%		[ oTypeStkChooseKind
+%		    | tpArray:
+%			.tSubscriptBegin
+%			.tLiteralInteger
+%			oValuePush(one)
+%			oEmitValue
+%			oValuePop
+%			.tSubscriptChar
+%			.tVarParm
+%		    | *:
+%		]
+%%%%%%%%%%
 		.tParmEnd
-		@WriteString
+		@WriteString	%%%%%%%%%% CHANGED
 	]}
 	oValuePop;
 
-WriteString :
+WriteString : 			%%%%%%%%%%% CHANGED
 	% Accept an optional field width specification, supplying
 	% a default field width if none is specified.  Verify that
 	% the expression to be written is of legal type.  The
@@ -2831,8 +3258,11 @@ WriteString :
 		[ oTypeStkChooseKind	% of expression being written
 		    | tpInteger, tpSubrange:
 			oValuePush(ten)
-		    | tpString:         % a literal string
-			oValuePushStringLength
+		    | tpString: 		%%%%%%%%%%% CHANGED
+			oValuePush(one)
+		    | tpPackedArray:	% a literal string
+			oValuePushTypeStkUpperBound
+			oValueNegate	% mark as code segment
 		    | *:	% An error flagged below
 			oValuePush(zero)
 		]
@@ -2841,16 +3271,16 @@ WriteString :
 		.tParmEnd
 	]
 	[ oTypeStkChooseKind
-	    | tpString:
+	    | tpString: 			%%%%%%%%%%% CHANGED
 		.tTrap
-		oEmitTrapKind(trWriteString)
+		oEmitTrapKind(trWriteString) 	%%%%%%%%%%% CHANGED
 	    | tpInteger, tpSubrange:
 		.tTrap
 		oEmitTrapKind(trWriteInteger)
-	    | tpArray, tpPackedArray:	% must be a string array
+	    | tpArray, tpPackedArray:	% must be a char array or literal string
 		oTypeStkPushComponent
 		[ oTypeStkChooseKind
-		    | tpString:
+		    | tpString: 		%%%%%%%%%%% CHANGED
 		    | *:
 			#eWriteExpn
 		]
@@ -2870,7 +3300,7 @@ WriteString :
 	oSymbolStkPop
 	oTypeStkPop;
 
-WriteNonString :
+WriteNonString : 	%%%%%%%%%%% CHANGED
 	% Check that the expression to be written matches the file type.
 	% The symbol and type stacks contain entries for the file
 	% variable and the expression to be written (expression on top).
@@ -2938,7 +3368,7 @@ WritelnProcedure :
 			oValuePop
 		]
 		oSymbolStkPop
-		.tVarParm
+	 	.tVarParm
 		.tParmEnd
 	    | sIdentifier:
 		oSymbolStkPushIdentifier
@@ -2951,32 +3381,32 @@ WritelnProcedure :
 				oTypeStkPushComponent
 				% writeln applies only to text files
 				[ oTypeStkChooseKind
-				    | tpString:
+				    | tpString: 	%%%%%%%%%%% CHANGED
 					% There should not be more parameters
 					[
 					    | sExpnEnd:
 						[
 						    | sParmEnd:
 						    | *:
-							#eStringFileVarReqd
+							#eStringFileVarReqd 	%%%%%%%%%%% CHANGED
 							@FlushActuals
 						]
 					    | *:
-						#eStringFileVarReqd
+						#eStringFileVarReqd 		%%%%%%%%%%% CHANGED
 						@FlushActuals
 					]
 				    | *:
-					#eStringFileVarReqd
+					#eStringFileVarReqd 			%%%%%%%%%%% CHANGED
 					@FlushActuals
 				]
 				oValuePop
 				oTypeStkPop
 			    | *:
-				#eStringFileVarReqd
+				#eStringFileVarReqd 	%%%%%%%%%%% CHANGED
 				@FlushActuals
 			]
 		    | *:
-			#eStringFileVarReqd
+			#eStringFileVarReqd 		%%%%%%%%%%% CHANGED
 			@FlushActuals
 		]
 		oTypeStkPop
@@ -2984,7 +3414,7 @@ WritelnProcedure :
 		.tVarParm
 		.tParmEnd
 	    | *:
-		#eStringFileVarReqd
+		#eStringFileVarReqd 			%%%%%%%%%%% CHANGED
 		@FlushActuals
 	];
 
@@ -3019,10 +3449,10 @@ ReadProcedure :
 				oValuePushSymbol	% file descriptor
 				oTypeStkPushComponent
 				[ oTypeStkChooseKind
-				    | tpString:
-					@ReadStringParameterList
+				    | tpString: 			%%%%%%%%%%% CHANGED
+					@ReadStringParameterList 	%%%%%%%%%%% CHANGED
 				    | *:
-					@ReadNonStringParameterList
+					@ReadNonStringParameterList 	%%%%%%%%%%% CHANGED
 				]
 				oValuePop
 				oTypeStkPop
@@ -3060,13 +3490,11 @@ ReadProcedure :
 			]
 			.tVarParm
 			.tParmEnd
-			@ReadString
-			% .tPopStack
-			% .tParmEnd
+			@ReadString 				%%%%%%%%%%% CHANGED
 			[
 			    | sParmEnd:
 			    | *:
-				@ReadStringParameterList
+				@ReadStringParameterList 	%%%%%%%%%%% CHANGED
 			]
 			oValuePop
 		]
@@ -3076,7 +3504,7 @@ ReadProcedure :
 	]
 	.tReadEnd;
 
-ReadStringParameterList :
+ReadStringParameterList : 	%%%%%%%%%%% CHANGED
 	% Accept a list of actual parameter variables to be
 	% read from a file of characters.
 
@@ -3098,14 +3526,12 @@ ReadStringParameterList :
 		]
 		.tVarParm
 		.tParmEnd
-		@ReadString
+		@ReadString 	%%%%%%%%%%% CHANGED
 		[ oSymbolStkChooseKind	% File symbol kind
 		    | syVarParameter:
 			.tFetchAddress
 		    | *:
 		]
-		% .tPopStack
-		% .tParmEnd
 		[
 		    | sParmEnd:
 			>
@@ -3117,7 +3543,7 @@ ReadStringParameterList :
 		>
 	]};
 
-ReadNonStringParameterList :
+ReadNonStringParameterList : 	%%%%%%%%%%% CHANGED
 	% Accept a list of actual parameter variables to be
 	% read from a non-text file.
 
@@ -3139,14 +3565,12 @@ ReadNonStringParameterList :
 		]
 		.tVarParm
 		.tParmEnd
-		@ReadNonString
+		@ReadNonString 	%%%%%%%%%%% CHANGED
 		[ oSymbolStkChooseKind	% File symbol kind
 		    | syVarParameter:
 			.tFetchAddress
 		    | *:
 		]
-		% .tPopStack
-		% .tParmEnd
 		[
 		    | sParmEnd:
 			>
@@ -3158,11 +3582,11 @@ ReadNonStringParameterList :
 		>
 	]};
 
-ReadString :
+ReadString : 					%%%%%%%%%%% CHANGED
 	[ oTypeStkChooseKind
-	    | tpString:
+	    | tpString: 			%%%%%%%%%%% CHANGED
 		.tTrap
-		oEmitTrapKind(trReadString)
+		oEmitTrapKind(trReadString) 	%%%%%%%%%%% CHANGED
 	    | tpInteger, tpSubrange:
 		.tTrap
 		oEmitTrapKind(trReadInteger)
@@ -3172,7 +3596,7 @@ ReadString :
 	oSymbolStkPop	% variable being read
 	oTypeStkPop;
 
-ReadNonString :
+ReadNonString : 				%%%%%%%%%%% CHANGED
 	[ oTypeStkChooseKind
 	    | tpInteger, tpSubrange:
 		oTypeStkPop
@@ -3239,31 +3663,31 @@ ReadlnProcedure :
 				oTypeStkPushComponent
 				% readln applies only to text files
 				[ oTypeStkChooseKind
-				    | tpString:
+				    | tpString: 	%%%%%%%%%%% CHANGED
 					% There should not be more parameters
 					[
 					    | sExpnEnd:
 						[
 						    | sParmEnd:
 						    | *:
-							#eStringFileVarReqd
+							#eStringFileVarReqd 	%%%%%%%%%%% CHANGED
 							@FlushActuals
 						]
 					    | *:
-						#eStringFileVarReqd
+						#eStringFileVarReqd 		%%%%%%%%%%% CHANGED
 						@FlushActuals
 					]
 				    | *:
-					#eStringFileVarReqd
+					#eStringFileVarReqd 	%%%%%%%%%%% CHANGED
 					@FlushActuals
 				]
 				oTypeStkPop
 			    | *:
-				#eStringFileVarReqd
+				#eStringFileVarReqd 		%%%%%%%%%%% CHANGED
 				@FlushActuals
 			]
 		    | *:
-			#eStringFileVarReqd
+			#eStringFileVarReqd 			%%%%%%%%%%% CHANGED
 			@FlushActuals
 		]
 		oTypeStkPop
@@ -3271,7 +3695,7 @@ ReadlnProcedure :
 		.tVarParm
 		.tParmEnd
 	    | *:
-		#eStringFileVarReqd
+		#eStringFileVarReqd 	%%%%%%%%%%% CHANGED
 		@FlushActuals
 	];
 
@@ -3288,7 +3712,7 @@ CaseSelectorExpression :
 	oTypeStkPop;
 
 BooleanControlExpression :
-	% Boolean control expressions occur in IF, WHILE and DO statements.
+	% Boolean control expressions occur in IF, WHILE and REPEAT statements.
 
 	@Expression
 	[ oTypeStkChooseKind
@@ -3324,12 +3748,12 @@ SymbolStkPushIntegerConstant :
 	oSymbolStkLinkToStandardType(stdInteger);
 
 
-SymbolStkPushStringConstant :
+SymbolStkPushStringConstant : 				%%%%%%%%%%% CHANGED
 	oSymbolStkPush(syConstant)
 	oValuePush(zero)
 	oSymbolStkEnterValue
 	oValuePop
-	oSymbolStkLinkToStandardType(stdString);
+	oSymbolStkLinkToStandardType(stdString); 	%%%%%%%%%%% CHANGED
 
 
 SymbolStkPushIntegerType :
