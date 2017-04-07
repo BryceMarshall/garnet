@@ -1561,9 +1561,9 @@ program Coder (output, coderSsl, tCode, object, options);
 
 
     procedure OperandPushStringDescriptor;
-	{ Push an operand stack entry for the string descriptor }
+	{ Push an operand stack entry for the string literal }
 	begin
-	    Assert ( (compoundToken = tStringDescriptor), assert28);
+	    Assert ( (compoundToken = tLiteralString), assert28);
 	    OperandPush (mString, compoundTokenValue, undefined, word);
 	end { OperandPushStringDescriptor };
 
@@ -1859,7 +1859,7 @@ program Coder (output, coderSsl, tCode, object, options);
 
 		    case compoundToken of
 			tLiteralAddress, tLiteralInteger, tLiteralChar,
-			tLiteralBoolean, tStringDescriptor, tSkipString,
+			tLiteralBoolean, tLiteralString,
 			tWhileTest, tWhileEnd, tRepeatTest, tCallEnd,
 			tLineNumber, tTrap, tIfThen, tIfMerge, tSkipProc,
 			tCaseSelect, tCaseMerge:
@@ -2207,7 +2207,6 @@ program Coder (output, coderSsl, tCode, object, options);
 			begin
 			    lastEmittedLineNumber := undefined;
 			    OptionallyEmitSourceCoordinate;
-			    AssertTempsAreAllFree
 			end;
 
 		    oEmitCaseMergeBranch:
@@ -2256,12 +2255,7 @@ program Coder (output, coderSsl, tCode, object, options);
 				undefined, word)
 			end;
 
-		    oOperandPushChar:
-			begin
-			    Assert ( (compoundToken = tLiteralChar), assert19);
-			    OperandPush (mManifest, compoundTokenValue,
-				undefined, byte)
-			end;
+		    { oOperandPushChar alternative removed }
 
 		    oOperandPushBoolean:
 			begin
@@ -2313,7 +2307,7 @@ program Coder (output, coderSsl, tCode, object, options);
 		    oOperandPushProcedure:
 			OperandPushProcedure;
 
-		    oOperandPushStringDescriptor:
+		    oOperandPushString: { Changed name to reflect string behaviour}
 			OperandPushStringDescriptor;
 
 		    oOperandPushTrap:
