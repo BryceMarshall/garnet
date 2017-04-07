@@ -29,8 +29,9 @@
 
 
 Input:		% corresponds to semantic.ssl output
+
 	tMultiply 
-	firstInputToken = tMultiply
+	firstOutputToken = tMultiply
 	tDivide
 	tModulus
 	tAdd
@@ -54,21 +55,21 @@ Input:		% corresponds to semantic.ssl output
 	tVarParm
 	tFetchAddress
 	tFetchInteger
-	tFetchString
+	tFetchString 		%%%%%%%%%%% CHANGED
 	tFetchBoolean
 	tAssignBegin
 	tAssignAddress
 	tAssignInteger
-	tAssignString
+	tAssignString		%%%%%%%%%%% CHANGED
 	tAssignBoolean
 	tStoreParmAddress
 	tStoreParmInteger
-	tStoreParmString
+	tStoreParmString 	%%%%%%%%%%% CHANGED
 	tStoreParmBoolean
 	tSubscriptBegin
 	tSubscriptAddress
 	tSubscriptInteger
-	tSubscriptString
+	tSubscriptString 	%%%%%%%%%%% CHANGED
 	tSubscriptBoolean
 	tArrayDescriptor
 	tFileDescriptor
@@ -76,8 +77,13 @@ Input:		% corresponds to semantic.ssl output
 	tIfEnd
 	tCaseBegin
 	tWhileBegin
+%%%%%%%%%%% CHANGED
+%	tRepeatBegin
+%	tRepeatControl
+%%%%%%%%%%% 
 	tDoBegin
-	tDoControl
+	tDoBreakIf
+%%%%%%%%%%% 
 	tCallBegin
 	tParmEnd
 	tProcedureEnd
@@ -86,21 +92,26 @@ Input:		% corresponds to semantic.ssl output
 	tTrapBegin
 	tWriteEnd
 	tReadEnd
-    tDoBreakIf
+%%%%%%%%%%% ADDED 
+	tCaseElse
 	tConcatenate
 	tSubstring
 	tLength
 	tIndex
 	tStringEqual
-    tCaseElse
-	tDoEnd
+%%%%%%%%%%% 
 
 	% Compound T-codes are those that take operands
 	tLiteralAddress
-	firstCompoundToken = tLiteralAddress
+	firstCompoundOutputToken = tLiteralAddress
 	tLiteralInteger
+%%%%%%%%%%% DELETED
+%	tLiteralChar
+%%%%%%%%%%% 
 	tLiteralBoolean
 	tLiteralString
+	tStringDescriptor
+	tSkipString
 	tIfThen
 	tIfMerge
 	tCaseSelect
@@ -108,15 +119,20 @@ Input:		% corresponds to semantic.ssl output
 	tCaseEnd
 	tWhileTest
 	tWhileEnd
+%%%%%%%%%%% CHANGED
+%	tRepeatTest
+%%%%%%%%%%% 
 	tDoTest
+	tDoEnd
+%%%%%%%%%%% 
 	tSkipProc
 	tCallEnd
 	tLineNumber
 	tTrap
-	lastCompoundToken = tTrap
+	lastCompoundOutputToken = tTrap
 
 	tEndOfFile
-	lastInputToken = tEndOfFile;
+	lastOutputToken = tEndOfFile;
 
 
 Error:

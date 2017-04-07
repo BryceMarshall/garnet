@@ -1111,10 +1111,6 @@ program SemanticAnalysis (output, semanticSsl, parseStream, temp, tCode, options
 		    write('too many actual parameters supplied');
 		eRecursiveCall:
 		    write('recursion not allowed');
-(********** ADDED 858 *)
-		eIllegalFunctionType:
-		    write('illegal function type');
-(**********)
 		eProcedureReqd:
 		    write('procedure name required');
 		eTypeIdentifierReqd:

@@ -69,9 +69,6 @@ Input :
 	sDoStmt
 	sBreakIf
 %%%%%%%%%%% 
-%%%%%%%%%%% ADDED 858 
-	sReturn
-%%%%%%%%%%% 
 	sEq
 	sNE
 	sLT
@@ -168,9 +165,6 @@ Output :	% corresponds to coder.ssl input
 	tIndex
 	tStringEqual
 %%%%%%%%%%% 
-%%%%%%%%%%% ADDED 858 
-	tFunctionResult
-%%%%%%%%%%% 
 
 	% Compound T-codes are those that take operands
 	tLiteralAddress
@@ -228,9 +222,6 @@ Error :
 	eInsufficientActuals
 	eExtraActuals
 	eRecursiveCall
-%%%%%%%%%%% ADDED 858
-	eIllegalFunctionType	
-%%%%%%%%%%% 
 	eProcedureReqd
 	eTypeIdentifierReqd
 	eIntegerExpnReqd
@@ -1609,28 +1600,7 @@ ProcedureDefinition :
 	oSymbolTblPushScope	% procedure scope
 	@ProcedureHeading
 
-%%%%%%%%%%% CHANGED 858
-%	@Block
-%%%%%%%%%%%
-        % If there is a return type, it is a function 
-	[
-	    | sIdentifier:
-		[ oSymbolStkChooseKind		% of this procedure 
-		    | syProcedure:
-			oSymbolStkSetKind(syFunction)
-		    | syPublicProcedure:
-			oSymbolStkSetKind(syPublicFunction)
-		]
-		% Process the return type identifier we just accepted
-		@FunctionReturnType
-		@Block
-		% Every function ends with a return statement
-	        sReturn
-		@FunctionReturnValue
-	    | *:
-		@Block
-	]
-%%%%%%%%%%% 
+	@Block
 
 	.tProcedureEnd
 	oFixPopForwardBranch	% fix skip around procedure
@@ -1717,75 +1687,6 @@ ProcedureParameterType :
 	oSymbolTblEnter;
 	% No type table entry is needed since the type
 	% must have been specified by named type.
-
-%%%%%%%%%%% ADDED 858
-FunctionReturnType :
-        % The symbol stack entry for the function is on top of the symbol stack.
-        % The type stack entry for the function is on top of the type stack.
-        % Process the return type of the function and fill it in to the function's type.
-
-        % The function's return type identifier has just been accepted
-        oSymbolStkPushIdentifier        % function return type name
-        [ oSymbolStkChooseKind
-            |syType:
-            |*:
-                #eTypeIdentifierReqd
-                oSymbolStkPop
-                @SymbolStkPushIntegerType
-        ]
-        oTypeStkPushSymbol              % return type
-        oSymbolStkPop                   % return type name
-
-        % Record the return type in the type entry for the function
-        [ oTypeStkChooseKind
-            |tpInteger:
-                oTypeStkPop             % return type
-                oTypeStkSetKind(tpInteger)
-            |tpBoolean:
-                oTypeStkPop             % return type
-                oTypeStkSetKind(tpBoolean)
-            |tpString:
-                oTypeStkPop             % return type
-                oTypeStkSetKind(tpString)
-            |*:
-                #eIllegalFunctionType
-                oTypeStkPop             % return type
-                oTypeStkSetKind(tpInteger)
-        ]
-        oTypeTblUpdate;
-
-FunctionReturnValue :
-        % Accept the result expression and check that its type is right 
-	.tFunctionResult
-        @Expression
-	oSymbolStkPop			% expression
-        [ oTypeStkChooseKind
-            |tpInteger:
-                oTypeStkPop 
-		[ oTypeStkChooseKind	% result type
-		    | tpInteger:
-		    | *:
-			#eTypeMismatch
-		]
-            |tpBoolean:
-                oTypeStkPop 
-		[ oTypeStkChooseKind	% result type
-		    | tpBoolean:
-		    | *:
-			#eTypeMismatch
-		]
-            |tpString:
-                oTypeStkPop 
-		[ oTypeStkChooseKind	% result type
-		    | tpString:
-		    | *:
-			#eTypeMismatch
-		]
-            |*:
-                #eTypeMismatch
-                oTypeStkPop             
-	];
-%%%%%%%%%%% 
 
 ProcedurePrologue :
 	% Now all the formal parameter symbols are stacked on top of the
@@ -2254,13 +2155,8 @@ Operand :
 		    | syVariable, syVarParameter:
 			@Variable
 			@VariableOperand
-%%%%%%%%%%% CHANGED 858
-%		    | syFunction: 
-%			@FunctionOperand
-%%%%%%%%%%% 
-		    | syFunction, syPublicFunction:
+		    | syFunction: 
 			@FunctionOperand
-%%%%%%%%%%% 
 		    | *:
 			#eExpnOperandReqd
 			oSymbolStkPop
@@ -2789,29 +2685,6 @@ FunctionOperand :
 	    | rtEOF:
 		@StandardFunctionActual
 		.tEOF
-%%%%%%%%%%% ADDED 858
-	    | *:
-                .tCallBegin
-		[
-		    | sParmBegin:
-			@ActualParameters
-		    | *:
-			oCountPush(zero)
-			[ oTypeStkCompareParameterCount
-			    | yes:      
-				% function takes zero parameters
-			    | *:
-				#eInsufficientActuals
-			]
-			oCountPop
-		]
-                .tCallEnd
-                oValuePushSymbol                % emit the function code address
-                oEmitValue
-                oValuePop
-                oSymbolStkPop                   % function name
-                oSymbolStkPush(syExpression)
-%%%%%%%%%%% 
 	];
 
 StandardFunctionActual :
