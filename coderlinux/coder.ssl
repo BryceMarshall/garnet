@@ -2984,7 +2984,51 @@ OperandConcatenatePop:
 
 
 OperandSubstringPopPop:
-    ;
+    % Get the substring of the left (third) operand starting at
+    % the lower index in the middle (second) operand and ending
+    % at the upper index in the right (top) operand. Pop the
+    % right and middle operands.
+
+    %% Save temporary registers
+    @SaveTempRegsToStack
+
+    %% Push operands to run stack
+    @OperandForceToStack        % ... x, y
+    @OperandForceToStack        % ... x
+    @OperandForceIntoTemp       % ... %T
+    @OperandForceToStack        % ...
+
+    %% Call substring trap
+    oOperandPushMode(mTrap)
+    oOperandSetValue(trSubstring)
+    oOperandSetLength(word)
+    oEmitSingle(iCall)          % jsr   pttrapNN
+    oOperandPop
+
+    %% Pop arguments
+    oOperandPushMode(mStackReg)
+    oOperandSetLength(word)
+    oOperandPushMode(mManifest)
+    oOperandSetLength(word)
+    oOperandSetValue(twelve)
+    oEmitDouble(iAdd)           % 	addl 	$12, %esp
+    oOperandPop
+    oOperandPop
+
+    %% Save result to scratch register
+    oOperandPushMode(mScratchReg1)
+    oOperandSetLength(word)
+    oOperandPushMode(mResultReg)
+    oOperandSetLength(word)
+    oEmitDouble(iMov)           %       movl    %eax, %S1
+    oOperandPop                 % %eax
+
+    %% Restore temp regs
+    @RestoreTempRegsFromStack	%	popl	%edx .. $eax
+
+    %% Force result to temp
+    @OperandForceIntoTemp       %       movl %S1, %T
+    oOperandSetLength(word);
 
 
 OperandIndexPop:
