@@ -2938,7 +2938,49 @@ OperandAssignStringPopPop:
 
 
 OperandConcatenatePop:
-    ;
+    % Concatenate the right (top) operand's value to the left (second)
+    % operand's value. Pop the right operand.
+
+    %% Save temporary registers
+    @SaveTempRegsToStack
+
+    %% Push operands to run stack
+    @OperandForceIntoTemp       % ... x, %T
+    @OperandForceToStack        % ... x
+    @OperandForceIntoTemp       % ... %T
+    @OperandForceToStack        % ...
+
+    %% Call string concatenation trap
+    oOperandPushMode(mTrap)
+    oOperandSetValue(trConcatenate)
+    oOperandSetLength(word)
+    oEmitSingle(iCall)          % jsr   pttrapNN
+    oOperandPop
+
+    %% Pop argument
+    oOperandPushMode(mStackReg)
+    oOperandSetLength(word)
+    oOperandPushMode(mManifest)
+    oOperandSetLength(word)
+    oOperandSetValue(four)
+    oEmitDouble(iAdd)           % 	addl 	$8, %esp
+    oOperandPop
+    oOperandPop
+
+    %% Save result to scratch register
+    oOperandPushMode(mScratchReg1)
+    oOperandSetLength(word)
+    oOperandPushMode(mResultReg)
+    oOperandSetLength(word)
+    oEmitDouble(iMov)           %       movl    %eax, %S1
+    oOperandPop                 % %eax
+
+    %% Restore temp regs
+    @RestoreTempRegsFromStack	%	popl	%edx .. $eax
+
+    %% Force result to temp
+    @OperandForceIntoTemp       %       movl %S1, %T
+    oOperandSetLength(word);
 
 
 OperandSubstringPopPop:
