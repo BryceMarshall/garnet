@@ -2883,9 +2883,9 @@ OperandAssignBooleanPopPop:
 OperandAssignStringPopPop:
     @SaveTempRegsToStack    %	pushl %eax .. %edx
 
-    @OperandForcetoStack    % The string value 
+    @OperandForceToStack    % The string value
     oOperandPop
-    @OperandForcetoStack    % The variable location
+    @OperandForceToStack    % The variable location
     oOperandPop
     oOperandPushMode(mTrap)
     oOperandSetValue(trAssignString)
@@ -2901,7 +2901,7 @@ OperandAssignStringPopPop:
     %@SaveTempRegsToStack	
 
     %% Now send the arguments
-    %@OperandForcetoStack        % The file descriptor 
+    %@OperandForceToStack        % The file descriptor
     %oOperandPop
     %oOperandPushMode(mTrap)
     %oOperandSetValue(trEof)
