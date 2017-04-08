@@ -134,7 +134,7 @@ program Coder (output, coderSsl, tCode, object, options);
 
 	{ Input Tokens }
 	tMultiply = 0;
-	firstOutputToken = 0;
+	firstInputToken = 0;
 	tDivide = 1;
 	tModulus = 2;
 	tAdd = 3;
@@ -197,7 +197,7 @@ program Coder (output, coderSsl, tCode, object, options);
 	tIndex = 60;
 	tStringEqual = 61;
 	tLiteralAddress = 62;
-	firstCompoundOutputToken = 62;
+	firstCompoundToken = 62;
 	tLiteralInteger = 63;
 	tLiteralBoolean = 64;
 	tLiteralString = 65;
@@ -216,9 +216,9 @@ program Coder (output, coderSsl, tCode, object, options);
 	tCallEnd = 78;
 	tLineNumber = 79;
 	tTrap = 80;
-	lastCompoundOutputToken = 80;
+	lastCompoundToken = 80;
 	tEndOfFile = 81;
-	lastOutputToken = 81;
+	lastInputToken = 81;
 
 	{ Output Tokens }
 
