@@ -1,0 +1,5 @@
+%Simple program testing a basic execution
+using progName1, progName2
+var a : integer
+;
+a = 2

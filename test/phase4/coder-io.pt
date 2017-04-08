@@ -1,0 +1,6 @@
+using progName
+
+var prompty: string
+
+write("Hello world")
+read(prompty)

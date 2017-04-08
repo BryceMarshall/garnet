@@ -1,0 +1,17 @@
+% Declare several variables of many types, and assign values to them.
+using progName
+var a : integer
+var b,c : integer
+var d : string
+var e,f : 1..10
+var g : array[1..10] of integer
+a = 1
+b = 2
+c = 3
+d = "abc"
+e = 11 %Should be illegal
+f = 2
+while (a<=10) do
+	g[a] = a
+	a = a+1
+end
