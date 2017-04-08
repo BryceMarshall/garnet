@@ -149,6 +149,7 @@ type Integer:
     two = 2
     four = 4
     eight = 8
+    ten = 10
     twelve = 12
 
     % Temporary registers

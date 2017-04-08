@@ -238,6 +238,7 @@ program Coder (output, coderSsl, tCode, object, options);
 	two = 2;
 	four = 4;
 	eight = 8;
+	ten = 10;
 	twelve = 12;
 	regAX = 1;
 	regBX = 2;
