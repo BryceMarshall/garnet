@@ -1534,13 +1534,13 @@ OperandPushExpression:
         oEmitNone(iText)                    %       .text
         oOperandPushString                  % ... sNN
         @OperandForceIntoTemp               % ... %T
-    | tConcatenate
+    | tConcatenate:
         @OperandConcatenatePop
-    | tSubstring
+    | tSubstring:
         @OperandSubstringPopPop
-    | tIndex
+    | tIndex:
         @OperandIndexPop
-    | tLength
+    | tLength:
         @OperandLength
 	| tNegate:
 	    @OperandNegate
@@ -2192,13 +2192,13 @@ OperandPushExpressionAssignPopPop:
 	| tAssignBoolean:
 	    @OperandAssignBooleanPopPop
 	    >
-    | tConcatenate
+    | tConcatenate:
         @OperandConcatenatePop
-    | tSubstring
+    | tSubstring:
         @OperandSubstringPopPop
-    | tIndex
+    | tIndex:
         @OperandIndexPop
-    | tLength
+    | tLength:
         @OperandLength
 	| tNegate:
 	    [
@@ -2818,7 +2818,7 @@ OperandChr:
 
     %% Call chr trap
     oOperandPushMode(mTrap)
-    oOperandSetValue(trChr)
+    oOperandSetValue(trChrString)
     oOperandSetLength(word)
     oEmitSingle(iCall)          % jsr   pttrapNN
     oOperandPop
@@ -3234,7 +3234,7 @@ OperandIndexPop:
 
     %% Call string index trap
     oOperandPushMode(mTrap)
-    oOperandSetValue(trIndex)
+    oOperandSetValue(trStringIndex)
     oOperandSetLength(word)
     oEmitSingle(iCall)          % jsr   pttrapNN
     oOperandPop
