@@ -108,14 +108,14 @@ Output :
 	pModule
 %%%%%%%%%%% 
 %%%%%%%%%%% ADDED 858
-	pReturn
+%	pReturn
 %%%%%%%%%%% 
 %%%%%%%%%%% CHANGED 458
 %	lastKeywordToken = pRepeat
 %%%%%%%%%%% CHANGED 858
-%	lastKeywordToken = pModule
+	lastKeywordToken = pModule
 %%%%%%%%%%% 
-	lastKeywordToken = pReturn
+%	lastKeywordToken = pReturn
 %%%%%%%%%%% 
 
 	% Scanner tokens -

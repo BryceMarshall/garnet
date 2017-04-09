@@ -100,66 +100,66 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	copied here from scan.def or parser.def, which must agree!}
 
 (********** CHANGED *)
+
 	{ Output Tokens }
 	pDiv = 0;
-	firstKeywordToken = 0;
-	pMod = 1;
-	pOr = 2;
-	pAnd = 3;
-	pThen = 4;
-	pElse = 5;
-	pOf = 6;
-	pEnd = 7;
-	pDo = 8;
-	pArray = 9;
-	pFile = 10;
-	pPacked = 11;
-	pUsing = 12;
-	pVal = 13;
-	pVar = 14;
-	pType = 15;
-	pDef = 16;
-	pIf = 17;
-	pUnless = 18;
-	pCase = 19;
-	pWhile = 20;
-	pElsif = 21;
-	pBreak = 22;
-	pWhen = 23;
-	pModule = 24;
-	pReturn = 25;
-	lastKeywordToken = 25;
-	pIdentifier = 26;
-	firstCompoundInputToken = 26;
-	pInteger = 27;
-	pLiteral = 28;
-	lastCompoundInputToken = 28;
-	pNewLine = 29;
-	pEndFile = 30;
-	pPlus = 31;
-	pMinus = 32;
-	pStar = 33;
-	pDot = 34;
-	pComma = 35;
-	pSemicolon = 36;
-	pEqualsEquals = 37;
-	pNot = 38;
-	pQuestion = 39;
-	pDollar = 40;
-	pHash = 41;
-	pColon = 42;
-	pEquals = 43;
-	pNotEqual = 44;
-	pLess = 45;
-	pLessEqual = 46;
-	pGreaterEqual = 47;
-	pGreater = 48;
-	pLeftParen = 49;
-	pRightParen = 50;
-	pLeftBracket = 51;
-	pRightBracket = 52;
-	pDotDot = 53;
-	lastSyntaxToken = 53;
+        firstKeywordToken = 0;
+        pMod = 1;
+        pOr = 2;
+        pAnd = 3;
+        pThen = 4;
+        pElse = 5;
+        pOf = 6;
+        pEnd = 7;
+        pDo = 8;
+        pArray = 9;
+        pFile = 10;
+        pPacked = 11;
+        pUsing = 12;
+        pVal = 13;
+        pVar = 14;
+        pType = 15;
+        pDef = 16;
+        pIf = 17;
+        pUnless = 18;
+        pCase = 19;
+        pWhile = 20;
+        pElsif = 21;
+        pBreak = 22;
+        pWhen = 23;
+        pModule = 24;
+        lastKeywordToken = 24;
+        pIdentifier = 25;
+        firstCompoundInputToken = 25;
+        pInteger = 26;
+        pLiteral = 27;
+        lastCompoundInputToken = 27;
+        pNewLine = 28;
+        pEndFile = 29;
+        pPlus = 30;
+        pMinus = 31;
+        pStar = 32;
+        pDot = 33;
+        pComma = 34;
+        pSemicolon = 35;
+        pEqualsEquals = 36;
+        pNot = 37;
+        pQuestion = 38;
+        pDollar = 39;
+        pHash = 40;
+        pColon = 41;
+        pEquals = 42;
+        pNotEqual = 43;
+        pLess = 44;
+        pLessEqual = 45;
+        pGreaterEqual = 46;
+        pGreater = 47;
+        pLeftParen = 48;
+        pRightParen = 49;
+        pLeftBracket = 50;
+        pRightBracket = 51;
+        pDotDot = 52;
+        lastSyntaxToken = 52;
 (**********)
 
 { ===== }
@@ -177,7 +177,7 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	sInteger = 1;
 	sLiteral = 2;
 	lastCompoundSemanticToken = 2;
-	sProgram = 3;
+	sUsing = 3;
 	sParmBegin = 4;
 	sParmEnd = 5;
 	sConst = 6;
@@ -208,28 +208,27 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 	sModule = 31;
 	sDoStmt = 32;
 	sBreakIf = 33;
-	sReturn = 34;
-	sEq = 35;
-	sNE = 36;
-	sLT = 37;
-	sLE = 38;
-	sGT = 39;
-	sGE = 40;
-	sAdd = 41;
-	sSubtract = 42;
-	sMultiply = 43;
-	sDivide = 44;
-	sModulus = 45;
-	sInfixOr = 46;
-	sOr = 47;
-	sInfixAnd = 48;
-	sAnd = 49;
-	sNot = 50;
-	sSubstring = 51;
-	sLength = 52;
-	sIndex = 53;
-	sNewLine = 54;
-	lastSemanticToken = 54;
+	sEq = 34;
+	sNE = 35;
+	sLT = 36;
+	sLE = 37;
+	sGT = 38;
+	sGE = 39;
+	sAdd = 40;
+	sSubtract = 41;
+	sMultiply = 42;
+	sDivide = 43;
+	sModulus = 44;
+	sInfixOr = 45;
+	sOr = 46;
+	sInfixAnd = 47;
+	sAnd = 48;
+	sNot = 49;
+	sSubstring = 50;
+	sLength = 51;
+	sIndex = 52;
+	sNewLine = 53;
+	lastSemanticToken = 53;
 (**********)
 
 { ===== }
@@ -325,9 +324,9 @@ program ScannerParser(output, stdIdentifiers, scanSsl, parseSsl, source,
 (********** CHANGED 458 *)
 (*	numberStdIdentifiers = 43; *)
 (********** CHANGED 858 *)
-(*	numberStdIdentifiers = 44; *)
+	numberStdIdentifiers = 44; 
 (**********)
-	numberStdIdentifiers = 45;
+(*	numberStdIdentifiers = 45; *)
 (**********)
 
 	textBufferSize = 80;

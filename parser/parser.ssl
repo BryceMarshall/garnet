@@ -72,14 +72,14 @@ Input :
 	pModule			'module'
 %%%%%%%%%%% 
 %%%%%%%%%%% ADDED 858
-	pReturn			'return'
+%	pReturn			'return'
 %%%%%%%%%%% 
 %%%%%%%%%%% CHANGED 458
 %	lastKeywordToken = pRepeat
 %%%%%%%%%%% CHANGED 858
-%	lastKeywordToken = pModule
+	lastKeywordToken = pModule
 %%%%%%%%%%% 
-	lastKeywordToken = pReturn
+%	lastKeywordToken = pReturn
 %%%%%%%%%%% 
 
 	pIdentifier 
@@ -129,7 +129,7 @@ Output :
 	sLiteral
 	lastCompoundSemanticToken = sLiteral
 
-	sProgram
+	sUsing
 	sParmBegin
 	sParmEnd
 	sConst
@@ -168,7 +168,7 @@ Output :
 	sBreakIf
 %%%%%%%%%%% 
 %%%%%%%%%%% ADDED 858 
-	sReturn
+% 	sReturn
 %%%%%%%%%%% 
 	sEq
 	sNE
@@ -199,11 +199,11 @@ rules
 
 Program :
 %%%%%%%%%%% CHANGED
-%	'program'  .sProgram
+%	'program'  .sUsing
 %	% program name
 %	pIdentifier
 %%%%%%%%%%% 
-	'using' .sProgram
+	'using' .sUsing
 %%%%%%%%%%% 
 	% program parameters
 %%%%%%%%%%% DELETED
@@ -285,16 +285,16 @@ Declarations:
 		]
 		@ProcedureHeading
 %%%%%%%%%%% CHANGED 858
-%		@Block
+		@Block
 %%%%%%%%%%% 
-		[
-		    | ':':
-			pIdentifier .sIdentifier
-			@Block  
-		        'return' .sReturn @Expression .sExpnEnd  
-		    | *:
-			@Block  
-		]
+%		[
+%		    | ':':
+%			pIdentifier .sIdentifier
+%			@Block  
+%		        'return' .sReturn @Expression .sExpnEnd  
+%		    | *:
+%			@Block  
+%		]
 %%%%%%%%%%% END 858 
 		'end'
 	    | 'module':
@@ -877,29 +877,29 @@ IdentifierExtension :
 		@Expression  ']'
 		.sExpnEnd
 %%%%%%%%%%% CHANGED 858
-%	    | '(':
-%		.sParmBegin
-%		@Expression  ')'
-%		.sExpnEnd
-%		.sParmEnd
-%%%%%%%%%%% 
 	    | '(':
-		[
-		    | ')':
-		    | *:
-			.sParmBegin
-			{
-			    @Expression
-			    .sExpnEnd
-			    [
-				| ',':
-				| *:
-				    >
-			    ]
-			}
-			')'
-			.sParmEnd
-		]
+		.sParmBegin
+		@Expression  ')'
+		.sExpnEnd
+		.sParmEnd
+%%%%%%%%%%% 
+%	    | '(':
+%		[
+%		    | ')':
+%		    | *:
+%			.sParmBegin
+%			{
+%			    @Expression
+%			    .sExpnEnd
+%			    [
+%				| ',':
+%				| *:
+%				    >
+%			    ]
+%			}
+%			')'
+%			.sParmEnd
+%		]
 %%%%%%%%%%% END 858
 	    | *:
 	];
