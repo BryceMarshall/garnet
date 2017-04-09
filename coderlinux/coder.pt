@@ -1899,7 +1899,6 @@ program Coder (output, coderSsl, tCode, object, options);
 			tLiteralString:
 			    begin
 				compoundTokenLength := compoundTokenValue;
-				Assert ( (compoundTokenLength >= 0), assert5);
 
                 compoundTokenValue := tCodeAddress;
                 i := 1;
