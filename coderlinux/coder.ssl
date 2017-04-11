@@ -2181,6 +2181,13 @@ OperandPushExpressionAssignPopPop:
 	    @OperandPushVariable
 	| tLiteralInteger:
 	    oOperandPushInteger
+    | tLiteralString:
+        % Emit string literal to data area
+        oEmitNone(iData)                    %       .data
+        oEmitString                         % sNN:  .asciz  "SSSSS"
+        oEmitNone(iText)                    %       .text
+        oOperandPushString                  % ... sNN
+        @OperandForceIntoTemp               % ... %T
 	| tLiteralBoolean:
 	    oOperandPushBoolean
 	| tAssignInteger:
