@@ -3106,9 +3106,11 @@ OperandAssignStringPopPop:
 
     %% Push operands to run stack
     @OperandForceIntoTemp       % ... x, %T
-    @OperandForceToStack        % ... x
+    @OperandForceToStack        % ... x, mStack
+    oOperandPop                 % ... x
     @OperandForceIntoTemp       % ... %T
-    @OperandForceToStack        % ...
+    @OperandForceToStack        % ... mStack
+    oOperandPop                 % ...
 
     %% Call string assignment trap
     oOperandPushMode(mTrap)
