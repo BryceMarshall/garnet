@@ -1,4 +1,4 @@
-using progName
+using output
 
 var prompty: string
 

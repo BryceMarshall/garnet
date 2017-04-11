@@ -1,4 +1,4 @@
-using progName
+using output
 %Use integer constants
 val a = 1
 val b = a

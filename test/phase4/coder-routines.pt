@@ -1,4 +1,4 @@
-using progName
+using output
 % Test routines in general
 def P()
     var a: integer

@@ -1,4 +1,4 @@
-using progName
+using output
 % Declare several types
 type a : integer
 type b : string

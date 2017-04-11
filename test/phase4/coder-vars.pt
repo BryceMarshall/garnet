@@ -1,5 +1,5 @@
 % Declare several variables of many types, and assign values to them.
-using progName
+using output
 var a : integer
 var b,c : integer
 var d : string

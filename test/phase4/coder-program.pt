@@ -1,5 +1,5 @@
 %Simple program testing a basic execution
-using progName1, progName2
+using output
 var a : integer
 ;
 a = 2

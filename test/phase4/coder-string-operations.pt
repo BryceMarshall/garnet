@@ -1,4 +1,4 @@
-using progName
+using output
 var a : integer
 var b : string
 var c : integer

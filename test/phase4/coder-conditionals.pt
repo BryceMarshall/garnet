@@ -1,4 +1,4 @@
-using progName
+using output
 var a : integer
 a = 2
 
