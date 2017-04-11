@@ -148,7 +148,6 @@ type Integer:
     one = 1
     two = 2
     four = 4
-    six = 6
     eight = 8
     ten = 10
     twelve = 12
@@ -3125,7 +3124,7 @@ OperandAssignStringPopPop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(four)
+    oOperandSetValue(eight)
     oEmitDouble(iAdd)           % 	addl 	$8, %esp
     oOperandPop
     oOperandPop
@@ -3160,7 +3159,7 @@ OperandConcatenatePop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(four)
+    oOperandSetValue(eight)
     oEmitDouble(iAdd)           % 	addl 	$8, %esp
     oOperandPop
     oOperandPop
@@ -3208,7 +3207,7 @@ OperandSubstringPopPop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(six)
+    oOperandSetValue(twelve)
     oEmitDouble(iAdd)           % 	addl 	$12, %esp
     oOperandPop
     oOperandPop
@@ -3254,7 +3253,7 @@ OperandIndexPop:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(four)
+    oOperandSetValue(eight)
     oEmitDouble(iAdd)           % 	addl 	$8, %esp
     oOperandPop
     oOperandPop
@@ -3297,7 +3296,7 @@ OperandLength:
     oOperandSetLength(word)
     oOperandPushMode(mManifest)
     oOperandSetLength(word)
-    oOperandSetValue(two)
+    oOperandSetValue(four)
     oEmitDouble(iAdd)           % 	addl 	$4, %esp
     oOperandPop
     oOperandPop

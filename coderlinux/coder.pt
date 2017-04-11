@@ -237,7 +237,6 @@ program Coder (output, coderSsl, tCode, object, options);
 	one = 1;
 	two = 2;
 	four = 4;
-	six = 6;
 	eight = 8;
 	ten = 10;
 	twelve = 12;
