@@ -1128,6 +1128,7 @@ DoStmt:
     oFixPushAddress				% bNNN:
     oEmitMergeSourceCoordinate
     @Statements
+    tDoBreakIf
     @OperandPushBooleanControlExpression	% ... cond
     tDoTest
 
