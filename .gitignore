@@ -7,3 +7,4 @@
 /lib/pt
 *.o
 *.diffs
+*.s

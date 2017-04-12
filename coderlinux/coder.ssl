@@ -2869,6 +2869,8 @@ OperandOrd:
     oOperandPushMode(mManifest)
     oOperandSetValue(zero)
     oOperandSetLength(word)
+    @OperandForceIntoTemp
+    oOperandSetLength(byte)
 
     oOperandSwap
     oEmitDouble(iMov)		% 	movb 	%T, %X
