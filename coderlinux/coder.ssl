@@ -856,7 +856,7 @@ Routine:
 		    oOperandSwap		% ... formal, 8(%ebp)
 		    oOperandPushCopy		% ... formal, 8(%ebp), 8(%ebp)
 		    oOperandSwapLeftAndDest	% ... 8(%ebp), formal, 8(%ebp)
-            oOperandSetLength(string)
+            oOperandSetLength(word)
             @OperandAssignStringPopPop % ... 8(%ebp)
 		| tParmEnd:	  
 		    >
@@ -1626,7 +1626,7 @@ OperandPushVariable:
 	| tFetchInteger:
 	| tFetchString:
         @OperandForceAddressIntoTemp
-        oOperandSetMode(mTempIndirect)  %Not sure of this one
+        oOperandSetMode(mTemp)  %Not sure of this one
 	| tFetchBoolean:
  	    oOperandSetLength(byte)
 	| *: 
