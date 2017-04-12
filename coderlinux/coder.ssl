@@ -933,7 +933,7 @@ CallStmt:
 	    @OperandPushExpression			% ... 0, argument
 	    @OperandConvertJumpConditionToData
 	    [
-		| tVarParm:	
+		| tVarParm:
 		    % call by reference
 		    @OperandForceAddressIntoTemp	% ... 0, addr(argument)
 		    @OperandForceToStack		%	pushl	addr(argument)
@@ -3142,10 +3142,12 @@ OperandConcatenatePop:
     @SaveTempRegsToStack
 
     %% Push operands to run stack
-    @OperandForceIntoTemp       % ... x, %T
-    @OperandForceToStack        % ... x
-    @OperandForceIntoTemp       % ... %T
-    @OperandForceToStack        % ...
+    @OperandForceAddressIntoTemp % ... x, %T
+    @OperandForceToStack         % ... x, mStack
+    oOperandPop                  % ... x
+    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceToStack         % ... mStack
+    oOperandPop                  % ...
 
     %% Call string concatenation trap
     oOperandPushMode(mTrap)
@@ -3190,10 +3192,11 @@ OperandSubstringPopPop:
     @SaveTempRegsToStack
 
     %% Push operands to run stack
-    @OperandForceToStack        % ... x, y
-    @OperandForceToStack        % ... x
-    @OperandForceIntoTemp       % ... %T
-    @OperandForceToStack        % ...
+    @OperandForceToStack         % ... x, y
+    @OperandForceToStack         % ... x
+    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceToStack         % ... mStack
+    oOperandPop                  % ...
 
     %% Call substring trap
     oOperandPushMode(mTrap)
@@ -3236,10 +3239,12 @@ OperandIndexPop:
     @SaveTempRegsToStack
 
     %% Push operands to run stack
-    @OperandForceIntoTemp       % ... x, %T
-    @OperandForceToStack        % ... x
-    @OperandForceIntoTemp       % ... %T
-    @OperandForceToStack        % ...
+    @OperandForceAddressIntoTemp % ... x, %T
+    @OperandForceToStack         % ... x, mStack
+    oOperandPop                  % ... x
+    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceToStack         % ... mStack
+    oOperandPop                  % ...
 
     %% Call string index trap
     oOperandPushMode(mTrap)
@@ -3281,8 +3286,9 @@ OperandLength:
     @SaveTempRegsToStack
 
     %% Push operands to run stack
-    @OperandForceIntoTemp       % ... %T
-    @OperandForceToStack        % ...
+    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceToStack         % ... mStack
+    oOperandPop                  % ...
 
     %% Call string length trap
     oOperandPushMode(mTrap)
@@ -3514,10 +3520,12 @@ OperandStringEqualPop:
     @SaveTempRegsToStack
 
     %% Push operands to run stack
-    @OperandForceIntoTemp       % ... x, %T
-    @OperandForceToStack        % ... x
-    @OperandForceIntoTemp       % ... %T
-    @OperandForceToStack        % ...
+    @OperandForceAddressIntoTemp % ... x, %T
+    @OperandForceToStack         % ... x, mStack
+    oOperandPop                  % ... x
+    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceToStack         % ... mStack
+    oOperandPop                  % ...
 
     %% Call string equality comparison trap
     oOperandPushMode(mTrap)
