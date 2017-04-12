@@ -2866,6 +2866,10 @@ OperandOrd:
     oOperandSetMode(mTempIndirect)  % ... memory(T)
     oOperandSetLength(byte)         %     of size one character
 
+    oOperandPushMode(mManifest)
+    oOperandSetValue(zero)
+    oOperandSetLength(word)
+
     oOperandSwap
     oEmitDouble(iMov)		% 	movb 	%T, %X
     @OperandPopAndFreeTemp
