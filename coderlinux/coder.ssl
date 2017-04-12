@@ -1250,6 +1250,8 @@ EmitDefaultCaseAbort:
     % which do not match a label.
     [
         | tCaseElse :     % If case else exists, handle it
+	    oFixPushAddress
+	    oFixSwapAddresses
             @Statements
             tCaseMerge
             oEmitCaseMergeBranch
