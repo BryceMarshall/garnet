@@ -3192,8 +3192,10 @@ OperandSubstringPopPop:
     @SaveTempRegsToStack
 
     %% Push operands to run stack
-    @OperandForceToStack         % ... x, y
-    @OperandForceToStack         % ... x
+    @OperandForceToStack         % ... x, y, z
+    oOperandPop                  % ... x, y
+    @OperandForceToStack
+    oOperandPop                  % ... x
     @OperandForceAddressIntoTemp % ... %T
     @OperandForceToStack         % ... mStack
     oOperandPop                  % ...
