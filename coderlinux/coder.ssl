@@ -776,10 +776,6 @@ Block:
 	    @ReadProc
 	| tTrapBegin:
 	    @TrapStmt
-	| *:
-	    >
-    ]}
-    [
 	| tSkipProc:
 	    % Branch around procedure definitions.
 	    oEmitUnconditionalForwardBranch
@@ -795,8 +791,10 @@ Block:
 
 	    oFixForwardBranch	% Branch around procedure defn's
 	    oFixPopAddress
+
 	| *:
-    ];
+	    >
+    ]};
 
 
 Routine:
@@ -1236,6 +1234,7 @@ EmitDefaultCaseAbort:
     % which do not match a label.
     [
         | tCaseElse :     % If case else exists, handle it
+	    oCaseEnterAbortAddress
 	    oFixPushAddress
 	    oFixSwapAddresses
             @Statements
