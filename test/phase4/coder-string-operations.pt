@@ -2,9 +2,41 @@ using output
 var a : integer
 var b : string
 var c : integer
+var d : array [1..2] of string
 a = (#"Hello") %5
+write(a)
+writeln()
 a = #"Hello" * 5
+write(a)
+writeln()
 b = "Hello, world!" $ 1..2
+write(b)
+writeln()
 b = "Hello, world!" $ (1*2)..3 
+write(b)
+writeln()
 c = "Hello there" ? "the" %7
+write(c)
+writeln()
 c = "Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
+write(c)
+writeln()
+write("Hello " + "World!"); writeln()
+if (a == a) then
+write("True"); writeln()
+end
+if (a != a) then
+write("never"); writeln()
+else
+write("Always"); writeln()
+end
+write(chr(97)); writeln()
+write(ord("a")); writeln()
+d[1] = "abcd"
+write(d[1]); writeln()
+d[2] = "efgh"
+write(d[2]); writeln()
+d[1] = d[2]
+write(d[1]); writeln()
+d[2] = b
+write(d[2]); writeln()

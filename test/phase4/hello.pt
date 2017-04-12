@@ -1,2 +1,10 @@
 using output
-write("Hello World!");
+var a : string
+val b = "Hello B"
+a = "Hello A"
+write("Hello World!")
+writeln()
+write(a)
+writeln()
+write(b)
+writeln()
