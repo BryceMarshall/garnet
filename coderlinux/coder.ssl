@@ -2860,16 +2860,12 @@ OperandChr:
 
 OperandOrd:
     % Convert the first character of the top operand into an integer
+    % String address is on top of stack
 
-    @OperandForceIntoTemp %... %T
-    oOperandSetMode(mTempIndirect)
+    @OperandForceAddressIntoTemp    % ... %T = addr(string)
+    oOperandSetMode(mTempIndirect)  % ... memory(T)
+    oOperandSetLength(byte)         %     of size one character
 
-    oOperandPushMode(mManifest) %... %T, $0
-    oOperandSetValue(zero)
-    oOperandSetLength(word)
-    @OperandForceIntoTemp	% 	movl	$0, %X
-                            % ... %T %X
-    oOperandSetLength(byte)
     oOperandSwap
     oEmitDouble(iMov)		% 	movb 	%T, %X
     @OperandPopAndFreeTemp
