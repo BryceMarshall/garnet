@@ -1879,9 +1879,8 @@ program Coder (output, coderSsl, tCode, object, options);
 		    nextTCodeAddress := nextTCodeAddress + 1;
 
 		    case compoundToken of
-			tLiteralAddress, tLiteralInteger, 
-			tLiteralBoolean, {tLiteralString,}
-			tWhileTest, tWhileEnd, tCallEnd,
+			tLiteralAddress, tLiteralInteger, tLiteralBoolean,
+			tWhileTest, tWhileEnd, tDoTest, tDoEnd, tCallEnd,
 			tLineNumber, tTrap, tIfThen, tIfMerge, tSkipProc,
 			tCaseSelect, tCaseMerge:
 			    ;	{ Do nothing }
