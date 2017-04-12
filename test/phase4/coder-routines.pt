@@ -1,6 +1,10 @@
 using output
 var inString : string
 val constString = "Constant String"
+def Q(a: string)
+	write(a)
+	writeln()
+end
 % Test routines in general
 write("Test suite for routines")
 writeln()
@@ -11,10 +15,6 @@ inString = "Passed variable"
 % Test routines with a single argument
 write("Test passing string parameters to a function")
 writeln()
-def Q(a: string)
-	write(a)
-	writeln()
-end
 
 Q(inString)
 Q("Literal String")
