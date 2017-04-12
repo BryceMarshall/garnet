@@ -1083,7 +1083,7 @@ WhileStmt:
 
     % Optimize if the condition is know at compile time
     [ oOperandChooseJumpCondition
-	| iJnever:
+	    | iJnever:
             % Exit condition is always false (while true) - an infinite loop.
             % emit no conditional branch, just fall into loop body
             oFixAndFreeFalseBranches
