@@ -1,6 +1,0 @@
-using output
-
-var prompty: string
-
-write("Hello world")
-read(prompty)

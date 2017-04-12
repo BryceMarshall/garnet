@@ -1,5 +1,0 @@
-%Simple program testing a basic execution
-using output
-var a : integer
-;
-a = 2
