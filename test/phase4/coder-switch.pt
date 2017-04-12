@@ -1,58 +1,45 @@
 using output
 var a : integer
+var b : integer
 a = 2
+b = 2
 
-case a
-end
-
-case a
+write("Test Case 1");writeln()
+case b
     when 2 then
-end
-
-case a
-    when 2 then
-        a = 3
-        a = 3
-end
-
-case a
-    else
-end
-
-case a
-    else
-        a = 3
-        a = 3
-end
-
-case a
-    when 2 then
+	write("Matched first case")
+	writeln();
     when 3 then
-end
-
-case a
-    when 2 then
-        a = 3
-        a = 3
-    when 3 then
-        a = 4
-        a = 4
-end
-
-case a
-    when 2 then
-    when 3 then
+	write("Should not match")
+	writeln()
     else
+	write("Should not match")
+	writeln()
 end
 
-case a
+write("Test Case 2");writeln()
+case b
+    when 1 then
+	write("Should not match")
+	writeln();
     when 2 then
-        a = 3
-        a = 3
-    when 3 then
-        a = 4
-        a = 4
+	write("Matched second case")
+	writeln()
     else
-        a = 5
-        a = 5
+	write("Should not match")
+	writeln()
+end
+
+write("Test Case 3");writeln()
+b=5
+case b
+    when 1 then
+	write("Should not match")
+	writeln();
+    when 4 then
+	write("Should not match")
+	writeln()
+    else
+	write("Matched else case")
+	writeln()
 end

@@ -2,41 +2,71 @@ using output
 var a : integer
 var b : string
 var c : integer
-var d : array [1..2] of string
+write("Test suite for string operations.")
+writeln()
+writeln()
+
+
 a = (#"Hello") %5
+write("Test string length operator: expected 5")
+writeln()
 write(a)
 writeln()
-a = #"Hello" * 5
-write(a)
-writeln()
+
+
 b = "Hello, world!" $ 1..2
+write("Test substring operator: expected He")
+writeln()
 write(b)
 writeln()
+
+
 b = "Hello, world!" $ (1*2)..3 
+write("Test substring operator with expressions as indices: expected el")
+writeln()
 write(b)
 writeln()
+
+
 c = "Hello there" ? "the" %7
+write("Test string index operator: expected 7")
+writeln()
 write(c)
 writeln()
+
+
 c = "Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
+write("Test string index operator with expression precedence: expected 35")
+writeln()
 write(c)
+writeln()
+
+
+write("Test string concatenation: expected Hello World!")
 writeln()
 write("Hello " + "World!"); writeln()
-if (a == a) then
-write("True"); writeln()
+
+
+write("Test string comparison, string equal to itself,");write(" not equal to itself, equal to a literal")
+writeln()
+if (b == b) then
+write("Success"); writeln()
 end
-if (a != a) then
+
+if (b != b) then
 write("never"); writeln()
 else
-write("Always"); writeln()
+write("Success"); writeln()
 end
+
+if (b == "el") then
+write("Success"); writeln()
+else
+write("never"); writeln()
+end
+
+
+write("Test chr and ord operations: expected a and 97");writeln()
 write(chr(97)); writeln()
 write(ord("a")); writeln()
-d[1] = "abcd"
-write(d[1]); writeln()
-d[2] = "efgh"
-write(d[2]); writeln()
-d[1] = d[2]
-write(d[1]); writeln()
-d[2] = b
-write(d[2]); writeln()
+

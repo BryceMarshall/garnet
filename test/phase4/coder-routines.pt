@@ -1,22 +1,21 @@
 using output
+var inString : string
+val constString = "Constant String"
 % Test routines in general
-def P()
-    var a: integer
-    a = 2
-end
+write("Test suite for routines")
+writeln()
+writeln()
+
+inString = "Passed variable"
+
 % Test routines with a single argument
-def Q(a: integer)
-   var b: integer
-   b = a + 2
-end
-% Test var arguments, and multiple arguments
-def R(var a: integer, var b: integer)
-   var c: integer
-   b = a + 2
+write("Test passing string parameters to a function")
+writeln()
+def Q(a: string)
+	write(a)
+	writeln()
 end
 
-var b: integer
-b = 2
-P()
-Q(b)
-R(b,b)
+Q(inString)
+Q("Literal String")
+Q(constString)

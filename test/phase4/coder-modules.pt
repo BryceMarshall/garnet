@@ -1,0 +1,35 @@
+using output
+
+def F()
+	write("Outer Function")
+	writeln()
+end
+
+module mod1
+	var a : integer
+	def F()
+		write("Inner Function")
+		writeln()
+	end
+	def * G()
+		write("Public Function")
+		writeln()
+	end
+
+	write("Test suite for modules")
+	writeln()
+	writeln()
+
+	write("Execute statments inside module")
+	writeln()
+	a=1
+	F()
+	G()
+end
+
+
+write("Execute statments outside module")
+writeln()
+		
+F()
+G()

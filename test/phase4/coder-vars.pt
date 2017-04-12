@@ -1,17 +1,29 @@
 % Declare several variables of many types, and assign values to them.
 using output
-var a : integer
-var b,c : integer
-var d : string
+var d : array[1..2] of string
 var e,f : 1..10
 var g : array[1..10] of integer
-a = 1
-b = 2
-c = 3
-d = "abc"
-e = 11 %Should be illegal
-f = 2
-while (a<=10) do
-	g[a] = a
-	a = a+1
-end
+val h = "Constant String"
+write("Test string arrays and constants to ensure they behave properly.")
+writeln()
+writeln()
+
+write("Assign string literal to index 1")
+writeln()
+d[1] = "abcd"
+write(d[1]); writeln()
+
+write("Assign string literal to index 2")
+writeln()
+d[2] = "efgh"
+write(d[2]); writeln()
+
+write("Assign value at index 2 to index 1")
+writeln()
+d[1] = d[2]
+write(d[1]); writeln()
+
+write("Assign string constant to index 2")
+writeln()
+d[2] = h 
+write(d[2]); writeln()

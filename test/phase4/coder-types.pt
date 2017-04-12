@@ -1,5 +1,0 @@
-using output
-% Declare several types
-type a : integer
-type b : string
-type c : array[1..10] of integer

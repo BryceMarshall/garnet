@@ -1,26 +1,26 @@
 using output
 var a : integer
-a = 2
 
+write("Test case 1");writeln()
+a = 2
 do
+   write("Testing statements before condition");writeln()
    break if a == 2
 end
 
+write("Test case 2");writeln()
+a = 2
 do
-   a = 3
    break if a == 3
+   a = 3
+   write("Testing statements after condition");writeln()
 end
 
+write("Test case 3");writeln()
+a = 2
 do
-    break if a == 4
-    a = 4
-    a = 4
-end
-
-do
-    a = 5
-    a = 5
-    break if a == 5
-    a = 5
-    a = 5
+    write("Testing statements before and after condition");writeln()
+    a = a+1
+    break if a >= 4
+    a =a+1 
 end
