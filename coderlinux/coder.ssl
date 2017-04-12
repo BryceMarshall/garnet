@@ -1248,12 +1248,13 @@ CaseEnd:
 EmitDefaultCaseAbort:
     % Emit a case abort alternative to handle selector values
     % which do not match a label.
-    [ | tCaseElse :     % If case else exists, handle it
-        @Statements
-        tCaseMerge
-        oEmitCaseMergeBranch
+    [
+        | tCaseElse :     % If case else exists, handle it
+            @Statements
+            tCaseMerge
+            oEmitCaseMergeBranch
 
-      | * :             % If case else doesn't exist, generate abort trap
+        | * :             % If case else doesn't exist, generate abort trap
             oCaseEnterAbortAddress		% aNNN:
             % Save the abort address for use by the selector out-of-range error
             % checks in the EmitCaseSubscriptJump rule.
