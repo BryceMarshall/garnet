@@ -2821,7 +2821,9 @@ OperandChr:
     @SaveTempRegsToStack
 
     %% Push operand to run stack
-    @OperandForceToStack        % ...
+    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceToStack         % ... mStack
+    oOperandPop                  % ...
 
     %% Call chr trap
     oOperandPushMode(mTrap)
