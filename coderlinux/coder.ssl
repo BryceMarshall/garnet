@@ -1228,47 +1228,67 @@ CaseEnd:
     % branch addresses.  Fix the merge branches from all the
     % alternatives to exit the statement.
 
-    @EmitDefaultCaseAbort		%	call	caseAbort
-    oFixForwardBranch			% fNNN:
-    oFixPopAddress
-    @EmitCaseSubscriptJump		%	movl	selector, %T
-					%	subl	lowerbound, %T
-					%	imul	$4, %T
-					%	movl	cNNN(%T), %T
-					%	jmp	%T
-    oEmitCaseBranchTable		% cNNN:	vNNN
-					%	vMMM
-					%	vLLL
-					%	...
-    % Fix the merge branches and pop the case stack entry
-    oCaseEnterMergeAddress		% mNNN:
-    oEmitMergeSourceCoordinate;
+    [
+        | tCaseElse :     % If case else exists, handle it
+            oFixForwardBranch			% fNNN:
+            oFixPopAddress
+            @EmitCaseSubscriptJump		%	movl	selector, %T
+                            %	subl	lowerbound, %T
+                            %	imul	$4, %T
+                            %	movl	cNNN(%T), %T
+                            %	jmp	%T
+            oEmitCaseBranchTable		% cNNN:	vNNN
+                            %	vMMM
+                            %	vLLL
+                            %	...
+
+            @Statements
+            tCaseMerge
+            oEmitCaseMergeBranch
+
+            % Fix the merge branches and pop the case stack entry
+            oCaseEnterMergeAddress		% mNNN:
+            oEmitMergeSourceCoordinate
+
+        | * :             % If case else doesn't exist, generate abort trap
+
+            @EmitDefaultCaseAbort		%	call	caseAbort
+            oFixForwardBranch			% fNNN:
+            oFixPopAddress
+            @EmitCaseSubscriptJump		%	movl	selector, %T
+                            %	subl	lowerbound, %T
+                            %	imul	$4, %T
+                            %	movl	cNNN(%T), %T
+                            %	jmp	%T
+            oEmitCaseBranchTable		% cNNN:	vNNN
+                            %	vMMM
+                            %	vLLL
+                            %	...
+
+            % Fix the merge branches and pop the case stack entry
+            oCaseEnterMergeAddress		% mNNN:
+            oEmitMergeSourceCoordinate
+
+    ];
 
 
 EmitDefaultCaseAbort:
     % Emit a case abort alternative to handle selector values
     % which do not match a label.
-    [ | tCaseElse :     % If case else exists, handle it
-        @Statements
-        tCaseMerge
-        oEmitCaseMergeBranch
-
-      | * :             % If case else doesn't exist, generate abort trap
-            oCaseEnterAbortAddress		% aNNN:
-            % Save the abort address for use by the selector out-of-range error
-            % checks in the EmitCaseSubscriptJump rule.
-            oFixPushAddress			% bNNN:		(label for abort)
-            oFixSwapAddresses			% (keep branch around case body on top)
-            oEmitMergeSourceCoordinate
-            oOperandPushMode(mLineNum)		% ... n
-            oOperandSetLength(word)
-            @OperandForceToStack		%	pushl	n
-            oOperandPop				% ...
-            oOperandPushMode(mTrap)
-            oOperandSetValue(trCaseAbort)
-            oEmitSingle(iCall)			% 	call  caseAbort
-            oOperandPop
-    ];
+    oCaseEnterAbortAddress		% aNNN:
+    % Save the abort address for use by the selector out-of-range error
+    % checks in the EmitCaseSubscriptJump rule.
+    oFixPushAddress			% bNNN:		(label for abort)
+    oFixSwapAddresses			% (keep branch around case body on top)
+    oEmitMergeSourceCoordinate
+    oOperandPushMode(mLineNum)		% ... n
+    oOperandSetLength(word)
+    @OperandForceToStack		%	pushl	n
+    oOperandPop				% ...
+    oOperandPushMode(mTrap)
+    oOperandSetValue(trCaseAbort)
+    oEmitSingle(iCall)			% 	call  caseAbort
+    oOperandPop;
 
 
 EmitCaseSubscriptJump:
