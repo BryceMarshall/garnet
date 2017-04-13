@@ -1234,9 +1234,10 @@ EmitDefaultCaseAbort:
     % which do not match a label.
     [
         | tCaseElse :     % If case else exists, handle it
-	    oCaseEnterAbortAddress
-	    oFixPushAddress
-	    oFixSwapAddresses
+            oCaseEnterAbortAddress
+            oFixPushAddress
+            oFixSwapAddresses
+            oEmitMergeSourceCoordinate
             @Statements
             tCaseMerge
             oEmitCaseMergeBranch
@@ -2810,7 +2811,7 @@ OperandChr:
     @SaveTempRegsToStack
 
     %% Push operand to run stack
-    @OperandForceIntoTemp 	 % ... %T
+    @OperandForceIntoTemp        % ... %T
     @OperandForceToStack         % ... mStack
     oOperandPop                  % ...
 
