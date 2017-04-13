@@ -1,0 +1,17 @@
+using output
+
+val CUTOFF = 10
+
+var n1, n2, n, i : integer
+
+n1 = 1
+write (n1); writeln
+n2 = 1
+write (n2); writeln
+i = 2
+while i < CUTOFF do
+    n = n2 + n1
+    write (n); writeln
+    n1 = n2
+    n2 = n
+end
