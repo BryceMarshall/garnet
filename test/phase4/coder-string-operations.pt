@@ -36,7 +36,7 @@ writeln()
 
 
 c = "Hello there" ? "the" + (5 * 6) %? has a lower precedence than (), higher precedence than +
-write("Test string index operator with expression precedence: expected 35")
+write("Test string index operator with expression precedence: expected 37")
 writeln()
 write(c)
 writeln()
@@ -54,7 +54,7 @@ write("Success"); writeln()
 end
 
 if (b != b) then
-write("never"); writeln()
+write("Failure"); writeln()
 else
 write("Success"); writeln()
 end
@@ -62,11 +62,27 @@ end
 if (b == "el") then
 write("Success"); writeln()
 else
-write("never"); writeln()
+write("Failure"); writeln()
 end
 
 
-write("Test chr and ord operations: expected a and 97");writeln()
+write("Test chr and ord operations: expected d, a, b, 101, and 97");writeln()
+a = 100
+write(chr(a));writeln()
 write(chr(97)); writeln()
+write(chr(98)); writeln()
+write(ord(b)); writeln()
 write(ord("a")); writeln()
+
+write("Test that chr and ord are inverse operations");writeln()
+if (chr(ord("a"))=="a") then
+write("Success"); writeln()
+else
+write("Failure"); writeln()
+end
+if (ord(chr(97))==97) then
+write("Success"); writeln()
+else
+write("Failure"); writeln()
+end
 
