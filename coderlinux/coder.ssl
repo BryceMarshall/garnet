@@ -2810,7 +2810,7 @@ OperandChr:
     @SaveTempRegsToStack
 
     %% Push operand to run stack
-    @OperandForceAddressIntoTemp % ... %T
+    @OperandForceIntoTemp 	 % ... %T
     @OperandForceToStack         % ... mStack
     oOperandPop                  % ...
 
